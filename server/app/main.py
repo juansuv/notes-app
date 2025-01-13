@@ -6,8 +6,8 @@ from app.routers import note
 
 app = FastAPI()
 
-app.include_router(user.router, prefix="/users", tags=["Users"])
-app.include_router(note.router, tags=["Notes"])
+app.include_router(user.router, prefix="/api/auth", tags=["Users"])
+app.include_router(note.router, prefix="/api/notes", tags=["Notes"])
 
 @app.on_event("startup")
 async def startup():
@@ -17,9 +17,15 @@ async def startup():
 async def shutdown():
     await database.disconnect()
 
-@app.get("/")
-async def read_root():
-    return {"message": "Database connected!"}
+@app.get("/api", tags=["Root"])
+async def api_root():
+    return {
+        "message": "Welcome to the Notes App API!",
+        "endpoints": {
+            "users": "/api/users",
+            "notes": "/api/notes",
+        },
+    }
 
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000)

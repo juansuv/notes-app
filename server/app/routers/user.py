@@ -7,14 +7,27 @@ from app.config.db import get_db
 
 router = APIRouter()
 
-@router.post("/register", response_model=UserResponse)
+
+@router.post(
+    "/register",
+    summary="Registrar un nuevo usuario",
+    description="Crea una nueva cuenta de usuario proporcionando un nombre de usuario único y una contraseña.",
+    response_description="El usuario registrado con su ID y nombre de usuario.",
+    response_model=UserResponse,
+)
 async def register_user(user: UserCreate, db: AsyncSession = Depends(get_db)):
     db_user = await get_user_by_username(db, user.username)
     if db_user:
         raise HTTPException(status_code=400, detail="Username already registered")
     return await create_user(db, user)
 
-@router.post("/login")
+
+@router.post(
+    "/login",
+    summary="Iniciar sesión",
+    description="Inicia sesión con un nombre de usuario y contraseña válidos para obtener un token JWT.",
+    response_description="El token JWT y su tipo (bearer).",
+)
 async def login_user(username: str, password: str, db: AsyncSession = Depends(get_db)):
     db_user = await get_user_by_username(db, username)
     if not db_user or not verify_password(password, db_user.password):
