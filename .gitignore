@@ -1,6 +1,6 @@
 # Python
 server/venv
-server/app/__pycache__
+**/__pycache__/
 
 # Config
 *.env
