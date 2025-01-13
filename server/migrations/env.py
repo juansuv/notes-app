@@ -4,17 +4,18 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import NullPool
 
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
-from app.models.models import Base
+from app.models import Base
 from alembic import context
 from app.config.db import DATABASE_URL
 
+from app.models.note import Note
+from app.models.user import User
 # Metadata de tus modelos
-target_metadata = Base.metadata
 
 # Configuración de la URL de la base de datos
 config = context.config
 config.set_main_option("sqlalchemy.url", DATABASE_URL)
-
+target_metadata = Base.metadata
 
 def run_migrations_offline() -> None:
     """Ejecuta las migraciones en modo offline."""
