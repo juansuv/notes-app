@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, Text, DateTime
 from sqlalchemy.orm import relationship
 from datetime import datetime
-from app.models import Base
+from .base import Base
 
 class Note(Base):
     id = Column(Integer, primary_key=True, index=True)
