@@ -1,8 +1,11 @@
 from fastapi import FastAPI
-from config.db import database
+from app.config.db import database
 import uvicorn
+from app.routers import user  
 
 app = FastAPI()
+
+app.include_router(user.router, prefix="/users", tags=["Users"])
 
 @app.on_event("startup")
 async def startup():
