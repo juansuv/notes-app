@@ -35,3 +35,16 @@ async def update_note(db: AsyncSession, note_id: int, user_id: int, updated_note
     await db.commit()
     await db.refresh(note)
     return note
+
+
+async def delete_note(db: AsyncSession, note_id: int, user_id: int):
+    # Verifica si la nota existe y pertenece al usuario
+    result = await db.execute(select(Note).where(Note.id == note_id, Note.owner_id == user_id))
+    note = result.scalar_one_or_none()
+    if not note:
+        return False  # Devuelve False si la nota no existe o no pertenece al usuario
+    
+    # Elimina la nota
+    await db.delete(note)
+    await db.commit()
+    return True
