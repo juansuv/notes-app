@@ -1,11 +1,13 @@
 from fastapi import FastAPI
 from app.config.db import database
 import uvicorn
-from app.routers import user  
+from app.routers import user
+from app.routers import note  
 
 app = FastAPI()
 
 app.include_router(user.router, prefix="/users", tags=["Users"])
+app.include_router(note.router, tags=["Notes"])
 
 @app.on_event("startup")
 async def startup():
