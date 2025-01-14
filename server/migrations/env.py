@@ -4,7 +4,7 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import NullPool
 
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
-from app.models import Base
+from app.models.base import Base
 from alembic import context
 from app.config.db import DATABASE_URL
 
