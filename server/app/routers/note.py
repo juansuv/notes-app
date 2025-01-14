@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.crud.note import *
-from app.schemas.note import NoteCreate, NoteResponse
+from app.schemas.note import NoteCreate, NoteResponse, NoteUpdate
 from app.schemas.shared_note import ShareNote
 from app.dependencies import get_db, get_current_user
 from app.models.user import User
@@ -71,16 +71,26 @@ async def get_note(
 )
 async def edit_note(
     note_id: int,
-    updated_note: NoteCreate,
+    updated_note: NoteUpdate,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    note = await update_note(db, note_id, current_user.id, updated_note)
-    if not note:
-        raise HTTPException(
-            status_code=404, detail="Note not found or not authorized to edit"
-        )
-    return note
+    result = await update_note(db, note_id, current_user.id, updated_note,  version=updated_note.version)
+     # Maneja errores basados en la respuesta
+    if "error" in result:
+        if result["error"] == "Note not found or unauthorized":
+            raise HTTPException(
+                status_code=404,
+                detail=result["error"]
+            )
+        elif result["error"] == "Conflict detected. The note was modified by another user.":
+            raise HTTPException(
+                status_code=409,
+                detail=result["error"]
+            )
+
+    # Si no hay error, devuelve la nota actualizada
+    return result["note"]
 
 
 @router.delete(
