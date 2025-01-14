@@ -2,16 +2,17 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from app.models.note import Note
 from app.schemas.note import NoteCreate
-
+from sqlalchemy.sql.expression import any_
 
 
 
 async def create_note(db: AsyncSession, note: NoteCreate, user_id: int):
+    print(note.shared_with)
     db_note = Note(
         **note.model_dump(),
         owner_id=user_id,
         version=1,
-        shared_with=note.shared_with or []
+        last_edited_by=user_id
     )
     db.add(db_note)
     await db.commit()
@@ -29,7 +30,7 @@ async def get_note_by_id(db: AsyncSession, note_id: int, user_id: int):
     result = await db.execute(
         select(Note).where(
             (Note.id == note_id)
-            & ((Note.owner_id == user_id) | (user_id.in_(Note.shared_with)))
+            & ((Note.owner_id == user_id) | (user_id == any_(Note.shared_with)))
         )
     )
     return result.scalar_one_or_none()
@@ -44,16 +45,17 @@ async def update_note(db: AsyncSession, note_id: int, user_id: int, updated_note
     # Verifica si la nota existe y si el usuario tiene permisos
     result = await db.execute(
         select(Note).where(
-            (Note.id == note_id) & ((Note.owner_id == user_id) | (user_id.in_(Note.shared_with)))
+            (Note.id == note_id) & ((Note.owner_id == user_id) | (user_id == any_(Note.shared_with)))
         )
     )
     note = result.scalar_one_or_none()
     if not note:
-        return None  # Nota no encontrada o sin permisos
+        return {"error": "Note not found or unauthorized"}
 
     # Verifica si la versión coincide
     if note.version != version:
         return {"error": "Conflict detected. The note was modified by another user."}
+
 
     # Actualiza los campos de la nota
     note.title = updated_note.title
@@ -62,7 +64,7 @@ async def update_note(db: AsyncSession, note_id: int, user_id: int, updated_note
     note.last_edited_by = user_id
     await db.commit()
     await db.refresh(note)
-    return note
+    return {"note": note}  # Retorna la nota en un diccionario
 
 
 async def delete_note(db: AsyncSession, note_id: int, user_id: int):
