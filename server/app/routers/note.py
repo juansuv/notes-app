@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.crud.note import *
 from app.schemas.note import NoteCreate, NoteResponse
+from app.schemas.shared_note import ShareNote
 from app.dependencies import get_db, get_current_user
 from app.models.user import User
 
@@ -99,3 +100,26 @@ async def delete_user_note(
         raise HTTPException(
             status_code=404, detail="Note not found or not authorized to delete"
         )
+
+
+@router.post("/{note_id}/share")
+async def share_note(note_id: int, share_data: ShareNote, user_id: int, db: AsyncSession = Depends(get_db)):
+    """
+    Agrega usuarios al campo `shared_with` de una nota.
+    Solo el propietario puede compartir la nota.
+    """
+    # Obtener la nota por ID y validar que el usuario sea el propietario
+    result = await db.execute(select(Note).where(Note.id == note_id, Note.owner_id == user_id))
+    note = result.scalar_one_or_none()
+    if not note:
+        raise HTTPException(status_code=404, detail="Note not found or unauthorized")
+
+    # Agregar los nuevos usuarios al campo shared_with
+    note.shared_with.extend(share_data.shared_with)
+    note.shared_with = list(set(note.shared_with))  # Evitar duplicados
+
+    # Guardar cambios en la base de datos
+    await db.commit()
+    await db.refresh(note)
+
+    return {"message": "Users added to shared_with", "shared_with": note.shared_with}
