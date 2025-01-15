@@ -5,9 +5,10 @@ import { Provider } from "react-redux";
 import Login from "./containers/pages/Login";
 import Error404 from "./containers/errors/Error404";
 import Home from "./containers/pages/Home";
-import Notes from "./containers/pages/Notes";
+import Notes from "./containers/pages/notes/Notes";
 import Register from "./containers/pages/Register";
 import ProtectedRoute from "./components/routers/ProtectedRoute";
+import NewNote from "./containers/pages/notes/NewNote";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
           {/* register display*/}
           <Route path="/register" element={<Register />} />
           {/* notes display*/}
+
           <Route
             path="/notes"
             element={
@@ -31,6 +33,15 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/new-note"
+            element={
+              <ProtectedRoute>
+                <NewNote />
+              </ProtectedRoute>
+            }
+          />
+
         </Routes>
       </Router>
     </Provider>
