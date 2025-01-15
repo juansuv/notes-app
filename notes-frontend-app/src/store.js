@@ -1,22 +1,17 @@
-import { Button, Container, Typography } from '@mui/material'
-import Error404 from './containers/errors/error_404'
-import Home from './containers/pages/home'
-import { useState } from 'react'
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
+import { createStore, applyMiddleware } from "redux";
+import { thunk } from "redux-thunk";
+import rootReducer from "./redux/reducers";
+import { composeWithDevTools } from '@redux-devtools/extension'; // Importa la función de la extensión
 
-function App() {
-  const [count, setCount] = useState(0)
+const initialState = {};
 
-  return (
-    <Router>
-      <Routes>
-        {/* error display*/}
-        <Route path="*" element={<Error404/>} />
-        {/* home display*/}
-        <Route path="/" element={<Home/>} />
-      </Routes>
-    </Router>
-  )
-}
+const middleware = [thunk];
 
-export default App
+const store = createStore(
+  rootReducer,
+  initialState,
+  //applyMiddleware(...middleware)
+  composeWithDevTools(applyMiddleware(...middleware))
+);
+
+export default store;
