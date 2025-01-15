@@ -22,6 +22,12 @@ export const loginUser =
 
       // Si el login es exitoso, despacha la acción de éxito con el token
       if (res.status === 200) {
+
+
+        localStorage.setItem("access_token", res.data.access_token);
+        localStorage.setItem("username", res.data.username);
+        localStorage.setItem("token_type", res.data.token_type);
+
         dispatch({
           type: LOGIN_USER_SUCCESS,
           payload: res.data, // Asegúrate de que tu API retorne el token en esta propiedad
