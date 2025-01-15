@@ -36,11 +36,7 @@ const authReducer = (state = initialState, action: any): AuthState => {
 
     case LOGOUT_USER: // Caso para manejar el logout
       return {
-        ...state,
-        access_token: null, // Limpiar el access_token
-        token_type: null,
-        username: null,
-        error: null,
+        ...initialState
       };
 
     default:
