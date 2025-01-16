@@ -1,26 +1,58 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { updateNote } from "../../../redux/actions/notes/notes";
+import { clearConflict, updateNote } from "../../../redux/actions/notes/notes";
 import { Box, Typography, Button } from "@mui/material";
 import NoteForm from "../../../components/notes/NoteForm";
 import { useNavigate } from "react-router-dom";
 import Layout from "../../../hocs/layouts/Layout";
 import Navbar from "../../../components/navigation/Navbar";
+import { useParams } from "react-router-dom";
 
-const ResolveConflict = ({ onResolve }) => {
-  const conflict = useSelector((state) => state.notes.conflict);
+
+const ResolveConflict = () => {
+  // const conflict = useSelector((state) => state.notes.conflict);
+  const [conflict, setConflict] = useState(null);
+  const conflictFromState = useSelector((state: any) => state.notes.conflict); // Desde el estado global
+
+  
+  const { id: noteId } = useParams<{ id: string }>(); // Obtén el ID de la nota desde la URL
+
   const dispatch = useDispatch();
   console.log("conflict", conflict);
   const [selectedVersion, setSelectedVersion] = useState("server"); // Puede ser 'server', 'client', o 'merged'
   const [mergedNote, setMergedNote] = useState({
-    title: conflict?.serverVersion.title + conflict?.clientVersion.title || "",
-    content: conflict?.serverVersion.content + conflict?.clientVersion.content || "",
-    version: conflict?.serverVersion.version
+    title: "",
+    content: "",
+    version: ""
   });
 
+  useEffect(() => {
+    
+    // Intenta cargar el conflicto del localStorage
+    const storedConflict = JSON.parse(localStorage.getItem("conflict"));
+    
+    if (conflictFromState) {
+      setConflict(conflictFromState); //carga conflicto del estado global
+    } else if (storedConflict && parseInt(storedConflict.serverVersion.id, 10) === parseInt(noteId, 10)) {
+      setConflict(storedConflict); //carga conflicto del localStorage
+    } else {
+      setConflict(null); //no existe conflicto
+    }
+  }, [conflictFromState, noteId]);
+
+
+  useEffect(() => {
+    // Inicializa los datos combinados si hay conflicto
+    if (conflict) {
+      setMergedNote({
+        title: conflict?.serverVersion.title + conflict?.clientVersion.title || "",
+        content: conflict?.serverVersion.content + conflict?.clientVersion.content || "",
+        version: conflict?.serverVersion.version
+      });
+    }
+  }, [conflict]);
+
   const navigate = useNavigate();
-  console.log("hayconflixt", conflict);
-  if (!conflict) return null;
 
   const handleResolve = () => {
     const noteToSave =
@@ -34,8 +66,14 @@ const ResolveConflict = ({ onResolve }) => {
             id: conflict.serverVersion.id,// Aseguramos usar la versión del servidor
           };
     dispatch(updateNote(noteToSave));
+    dispatch(clearConflict());
+    setConflict(null);
     navigate(`/notes`);
   };
+  
+  if (!conflict) {
+    return <div>No hay conflictos para esta nota.</div>;
+  }
 
   return (
     <Layout>

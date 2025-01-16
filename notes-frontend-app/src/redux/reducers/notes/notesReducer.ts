@@ -21,7 +21,7 @@ const initialState: NotesState = {
   loading: false,
   notes: [],
   error: null,
-  conflict: null, // Almacena las versiones en conflicto
+  conflict: JSON.parse(localStorage.getItem("conflict")) || {}, // Almacena las versiones en conflicto
 };
 
 const notesReducer = (state = initialState, action: any): NotesState => {
@@ -68,11 +68,14 @@ const notesReducer = (state = initialState, action: any): NotesState => {
         notes: state.notes.filter((note) => note.id !== action.payload),
       };
     case UPDATE_NOTE_CONFLICT:
+      console.log("conflict save in locale storage", action.payload);
+      localStorage.setItem("conflict", JSON.stringify(action.payload));
       return {
         ...state,
         conflict: action.payload, // Guarda las versiones en conflicto
       };
     case CLEAR_CONFLICT:
+      localStorage.removeItem("conflict");
       return {
         ...state,
         conflict: null, // Limpiamos el conflicto manualmente
