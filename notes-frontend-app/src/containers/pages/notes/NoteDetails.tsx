@@ -32,9 +32,9 @@ const NoteDetails = () => {
     }
   }, [dispatch, notes, note]);
 
-  const handleSubmit = (updatedNote) => {
-    dispatch(updateNote({ ...updatedNote, id, version:note.version })); // Actualizamos la nota en Redux
-    navigate("/notes"); // Redirigimos a la lista de notas
+  const handleSubmit = async (updatedNote) => {
+    const result = await dispatch(updateNote({ ...updatedNote, id, version:note.version })); // Actualizamos la nota en Redux
+    return result; 
   };
 
   if (loading || !note) {
