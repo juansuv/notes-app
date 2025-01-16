@@ -3,7 +3,9 @@ import {
   FETCH_NOTES_REQUEST,
   FETCH_NOTES_SUCCESS,
   FETCH_NOTES_FAILURE,
-  CREATE_NOTE_SUCCESS
+  CREATE_NOTE_SUCCESS,
+  UPDATE_NOTE_SUCCESS,
+  DELETE_NOTE_SUCCESS
 } from "../../actions/notes/types";
 
 interface NotesState {
@@ -48,6 +50,20 @@ const notesReducer = (state = initialState, action: any): NotesState => {
       };
     default:
       return state;
+    
+      case UPDATE_NOTE_SUCCESS:
+        return {
+          ...state,
+          notes: state.notes
+            .map((note) => (note.id === action.payload.id ? action.payload : note)) // Sustituye la nota
+        };
+      
+      case DELETE_NOTE_SUCCESS:
+        return {
+          ...state,
+          notes: state.notes.filter((note) => note.id !== action.payload),
+        };
+      
   }
 };
 
