@@ -8,9 +8,10 @@ import {
   FETCH_NOTES_REQUEST,
   FETCH_NOTES_SUCCESS,
   FETCH_NOTES_FAILURE,
+  UPDATE_NOTE_CONFLICT,
+  CLEAR_CONFLICT,
 } from "./types";
-
-
+import { debug } from "console";
 
 export const createNoteSuccess = (note) => ({
   type: CREATE_NOTE_SUCCESS,
@@ -29,8 +30,12 @@ export const createNote = (note) => async (dispatch, getState) => {
         Authorization: `${token_type} ${token}`,
       },
     });
+    console.log("creonota" );
     dispatch(createNoteSuccess(response.data));
+    debugger;
+    return { success: true };
   } catch (error) {
+    debugger;
     console.error("Error al crear la nota:", error);
   }
 };
@@ -43,7 +48,7 @@ export const updateNote = (note) => async (dispatch, getState) => {
 
   console.log("note", note);
   try {
-    console.log(apiUrl);
+    console.log("nota enviada a actualizar", note);
     const response = await axios.put(`${apiUrl}/api/notes/${note.id}`, note, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -54,11 +59,31 @@ export const updateNote = (note) => async (dispatch, getState) => {
       type: UPDATE_NOTE_SUCCESS,
       payload: response.data,
     });
+    return { success: true };
   } catch (error) {
-    debugger;
-    console.error("Error al actualizar la nota:", error);
+    if (error.response?.status === 409) {
+      // Si hay un conflicto, despacha la acción de conflicto
+      dispatch({
+        type: UPDATE_NOTE_CONFLICT,
+        payload: {
+          serverVersion: error.response.data.detail.server_version,
+          clientVersion: error.response.data.detail.client_version,
+        },
+      });
+      debugger;
+      return { conflict: true, note_id: error.response.data.detail.server_version.id };
+    } else {
+      console.error("Error al actualizar la nota:", error);
+      return { success: false };
+    }
+
   }
 };
+
+
+export const clearConflict = () => ({
+  type: CLEAR_CONFLICT,
+});
 
 export const deleteNote = (id) => async (dispatch, getState) => {
   const state = getState();
@@ -108,7 +133,6 @@ export const fetchNotes = () => async (dispatch: any, getState: any) => {
   dispatch(fetchNotesRequest());
 
   try {
-      
     const response = await axios.get(`${apiUrl}/api/notes`, {
       headers: {
         Authorization: `${token_type} ${token}`,
