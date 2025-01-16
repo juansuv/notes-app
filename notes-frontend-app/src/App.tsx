@@ -9,7 +9,7 @@ import Notes from "./containers/pages/notes/Notes";
 import Register from "./containers/pages/Register";
 import ProtectedRoute from "./components/routers/ProtectedRoute";
 import NewNote from "./containers/pages/notes/NewNote";
-
+import NoteDetails from "./containers/pages/notes/NoteDetails";
 function App() {
   return (
     <Provider store={store}>
@@ -38,6 +38,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <NewNote />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/notes/:id"
+            element={
+              <ProtectedRoute>
+                <NoteDetails />
               </ProtectedRoute>
             }
           />

@@ -1,23 +1,43 @@
 import Layout from "hocs/layouts/Layout";
 import Navbar from "../../components/navigation/Navbar";
-import { Box, Button, TextField, Typography, Paper, Grid, Alert } from "@mui/material";
+import {
+  Box,
+  Button,
+  TextField,
+  Typography,
+  Paper,
+  Grid,
+  Alert,
+} from "@mui/material";
 import image from "../../assets/img/banner-login.webp"; // Cambia la ruta si es necesario
-import { Link } from "react-router-dom";
-import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
 import { registerUser } from "../../services/userService";
 
+
+
+
 const Register = () => {
-
-
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [success, setSuccess] = useState(false);
 
+  const navigate = useNavigate();
 
+
+  useEffect(() => {
+    if (success) {
+      navigate("/login");
+    }
+  }, [success, navigate]);
+   
   const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const result = await registerUser(name, password);
+
+
+
 
     console.log("Register submitted");
     if (result.success) {
@@ -29,7 +49,6 @@ const Register = () => {
       setMessage(result.message);
       setSuccess(false);
     }
-    
   };
   return (
     <Layout>
@@ -183,10 +202,10 @@ const Register = () => {
               </Link>
             </Typography>
             {message && (
-            <Alert severity={success ? "success" : "error"} sx={{ mt: 2 }}>
-              {message}
-            </Alert>
-          )}
+              <Alert severity={success ? "success" : "error"} sx={{ mt: 2 }}>
+                {message}
+              </Alert>
+            )}
           </Paper>
         </Grid>
       </Grid>
