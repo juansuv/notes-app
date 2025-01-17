@@ -2,7 +2,19 @@ import React from "react";
 import { Box, Typography } from "@mui/material";
 import NoteForm from "./NoteForm"; // Importa tu NoteForm
 
-const SelectableBox = ({
+interface SelectableBoxProps {
+  title: string;
+  initialData: any;
+  selected: boolean;
+  onSubmit: (data: any) => void;
+  onClick: () => void;
+  mode?: "view" | "edit";
+  autoSave?: boolean;
+  showSubmitButton?: boolean;
+  viewNote?: string;
+}
+
+const SelectableBox: React.FC<SelectableBoxProps> = ({
   title,
   initialData,
   selected,
@@ -11,7 +23,7 @@ const SelectableBox = ({
   mode = "view",
   autoSave = false,
   showSubmitButton = false,
-  viewNote = ""
+  viewNote = "",
 }) => {
   return (
     <Box
@@ -44,6 +56,7 @@ const SelectableBox = ({
       >
         {title}
       </Typography>
+
       <NoteForm
         initialData={initialData}
         mode={mode}

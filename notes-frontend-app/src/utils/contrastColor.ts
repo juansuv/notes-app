@@ -8,6 +8,7 @@ export const getContrastColor = (bgColor: string) => {
   return luminance > 186 ? "#000" : "#fff";
 };
 
+// Función para ajustar el color en tonos más claros u oscuros
 export const adjustColor = (color: string, amount: number): string => {
   let usePound = false;
 
@@ -28,3 +29,17 @@ export const adjustColor = (color: string, amount: number): string => {
   return (usePound ? "#" : "") + ((r << 16) | (g << 8) | b).toString(16).padStart(6, "0");
 };
 
+// función para invertir color
+export const getInvertedColor = (hexColor: string): string => {
+  // Convierte el color hexadecimal en valores RGB
+  const r = parseInt(hexColor.slice(1, 3), 16);
+  const g = parseInt(hexColor.slice(3, 5), 16);
+  const b = parseInt(hexColor.slice(5, 7), 16);
+
+  // Calcula la luminosidad relativa (método estándar para determinar contraste)
+  const luminosity = 0.299 * r + 0.587 * g + 0.114 * b;
+
+  // Devuelve blanco para colores oscuros y negro para colores claros
+  console.log('color es', luminosity, hexColor);
+  return luminosity > 128 ? "#000000" : "#ffffff";
+};

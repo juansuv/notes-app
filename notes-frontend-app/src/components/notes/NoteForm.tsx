@@ -26,8 +26,9 @@ interface NoteFormProps {
   autoSave?: boolean;
   showSubmitButton?: boolean;
   viewNote?: string;
-  id: number;
+
 }
+
 
 const NoteForm: React.FC<NoteFormProps> = ({
   initialData = {
@@ -39,10 +40,10 @@ const NoteForm: React.FC<NoteFormProps> = ({
   },
   onSubmit,
   mode = "edit",
-  autoSave = false,
   showSubmitButton = true,
   viewNote = "Ver Nota",
-  id = 0,
+  autoSave = false,
+
 }) => {
   const [title, setTitle] = useState(initialData.title);
   const [content, setContent] = useState(initialData.content);
@@ -56,6 +57,7 @@ const NoteForm: React.FC<NoteFormProps> = ({
 
   useEffect(() => {
     if (mode !== "create") {
+      console.log("actualiza los datos el usseefect de la nota")
       setTitle(initialData.title);
       setContent(initialData.content);
       setVersion(initialData.version);
@@ -64,20 +66,45 @@ const NoteForm: React.FC<NoteFormProps> = ({
     }
   }, [initialData, mode]);
 
+  const handleFieldChange = (field: string, value: any) => {
+    switch (field) {
+      case "title":
+        setTitle(value);
+        break;
+      case "content":
+        setContent(value);
+        break;
+      case "tags":
+        setTags(value);
+        break;
+      case "color":
+        setColor(value);
+        break;
+      default:
+        break;
+    }
+    if (autoSave) {
+      const updatedData = {
+        title,
+        content,
+        version,
+        tags,
+        color,
+        [field]: value, // Sobrescribe el campo modificado
+      };
+      console.log("AutoSave activado, enviando datos:", updatedData);
+      onSubmit(updatedData);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!title.trim() || !content.trim()) {
-      alert("Por favor completa todos los campos.");
+      alert("Por favor completa los campos titulo y contenido");
       return;
     }
-    const result = await onSubmit({ title, content, version, tags, color });
-    if (result?.conflict) {
-      navigate(`/notes/${result.note_id}/resolve-conflict`);
-    } else if (result?.success) {
-      navigate(`/notes`);
-    } else {
-      alert("Error al actualizar la nota.");
-    }
+    console.log("envia la nota al submit con",title, content, version, tags, color )
+    onSubmit({ title, content, version, tags, color });
   };
 
   const isViewMode = mode === "view";
@@ -126,7 +153,7 @@ const NoteForm: React.FC<NoteFormProps> = ({
             variant="outlined"
             fullWidth
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            onChange={(e) => handleFieldChange("title", e.target.value)}
             required
             disabled={isViewMode}
             InputLabelProps={{ style: { color: textColor } }}
@@ -141,7 +168,7 @@ const NoteForm: React.FC<NoteFormProps> = ({
             multiline
             rows={6}
             value={content}
-            onChange={(e) => setContent(e.target.value)}
+            onChange={(e) => handleFieldChange("content", e.target.value)}
             required
             disabled={isViewMode}
             InputLabelProps={{ style: { color: textColor } }}
@@ -150,21 +177,19 @@ const NoteForm: React.FC<NoteFormProps> = ({
             }}
           />
 
-          {!isViewMode && (
-            <TagsInput
-              noteId={parseInt(id)}
-              currentTags={tags}
-              onChange={(updatedTags) => setTags(updatedTags)}
-              textColor={textColor} // Pasamos el color de texto dinámico
-            />
-          )}
+          <TagsInput
+            currentTags={tags}
+            onChange={(updatedTags) => handleFieldChange("tags", updatedTags)}
+            textColor={textColor}
+            viewMode={isViewMode}
+          />
 
           {!isViewMode && (
             <ColorPicker
-              noteId={parseInt(id)}
               currentColor={color}
-              onChange={(updatedColor) => setColor(updatedColor)}
+              onChange={(updatedColor) => handleFieldChange("color", updatedColor)}
               textColor={textColor}
+              viewMode={isViewMode}
             />
           )}
 
@@ -175,11 +200,11 @@ const NoteForm: React.FC<NoteFormProps> = ({
               sx={{
                 marginTop: 2,
                 color: textColor,
-                backgroundColor: adjustColor(color, 50), // Ajustamos el color normal del botón para que sea más brillante
+                backgroundColor: adjustColor(color, 50),
                 border: `2px solid ${textColor}`,
                 "&:hover": {
                   backgroundColor:
-                    color === "#000000" ? "#333333" : adjustColor(color, -50), // Color más oscuro al hacer hover
+                    color === "#000000" ? "#333333" : adjustColor(color, -50),
                   border: `2px solid ${textColor}`,
                 },
               }}

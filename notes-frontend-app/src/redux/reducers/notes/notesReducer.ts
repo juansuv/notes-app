@@ -71,7 +71,6 @@ const notesReducer = (state = initialState, action: any): NotesState => {
         notes: state.notes.filter((note) => note.id !== action.payload),
       };
     case UPDATE_NOTE_CONFLICT:
-      ("conflict save in locale storage", action.payload);
       localStorage.setItem("conflict", JSON.stringify(action.payload));
       return {
         ...state,
@@ -85,7 +84,6 @@ const notesReducer = (state = initialState, action: any): NotesState => {
       };
 
     case UPDATE_NOTE_TAGS:
-      ("update tags", action.payload);
       return {
         ...state,
         notes: state.notes.map((note) =>
@@ -95,8 +93,6 @@ const notesReducer = (state = initialState, action: any): NotesState => {
         ),
       };
     case UPDATE_NOTE_COLOR:
-      ("update tags", action.payload);
-      ("update noteid", action.payload.noteId);
       return {
         ...state,
         notes: state.notes.map((note) =>

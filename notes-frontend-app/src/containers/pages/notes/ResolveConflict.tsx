@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { clearConflict, updateNote } from "../../../redux/actions/notes/notes";
-import { Box, Typography, Button } from "@mui/material";
+import { Box, Typography, Button, colors } from "@mui/material";
 import SelectableBox from "../../../components/notes/SelectableBox"; // Importa tu nuevo componente
 import Layout from "../../../hocs/layouts/Layout";
 import Navbar from "../../../components/navigation/Navbar";
@@ -17,6 +17,8 @@ const ResolveConflict = () => {
     title: "",
     content: "",
     version: "",
+    tags: [],
+    color: "",
   });
 
   const navigate = useNavigate();
@@ -42,6 +44,8 @@ const ResolveConflict = () => {
         title: conflict?.serverVersion.title + conflict?.clientVersion.title || "",
         content: conflict?.serverVersion.content + conflict?.clientVersion.content || "",
         version: conflict?.serverVersion.version,
+        tags: [...new Set([...(conflict?.serverVersion?.tags), ...(conflict?.clientVersion?.tags)])],
+        color: conflict?.serverVersion.color,
       });
     }
   }, [conflict]);
@@ -124,10 +128,13 @@ const ResolveConflict = () => {
             selected={selectedVersion === "merged"}
             onSubmit={(data) => {
               setSelectedVersion("merged");
-              ("Merged data", data);
+              console.log("Merged desde onsumit data", data);
               setMergedNote(data);
             }}
-            onClick={() => setSelectedVersion("merged")}
+            onClick={(data) => {
+              console.log("Merged esde click data", data);
+              setSelectedVersion("merged")}
+            }
           />
         </Box>
 

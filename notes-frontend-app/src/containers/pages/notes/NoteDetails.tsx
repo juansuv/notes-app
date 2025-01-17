@@ -26,7 +26,7 @@ const NoteDetails = () => {
     if (!notes.length) {
       dispatch(fetchNotes()); // Si no hay notas cargadas, las buscamos
     } else if (note) {
-      ("note initialdata", note);
+      // Actualizamos initialData con los datos de la nota específica
       setInitialData({
         title: note.title,
         content: note.content,
@@ -38,9 +38,26 @@ const NoteDetails = () => {
   }, [dispatch, notes, note]);
 
   const handleSubmit = async (updatedNote) => {
+    // Incluimos todos los campos en la actualización
     const result = await dispatch(
-      updateNote({ ...updatedNote, id, version: note.version })
-    ); // Actualizamos la nota en Redux
+      updateNote({
+        ...note, // Incluimos los campos existentes de la nota
+        ...updatedNote, // Sobrescribimos los campos actualizados
+        id, // Incluimos el ID
+        version: note.version, // Usamos la versión actual
+      })
+    );
+
+    // Manejar el resultado de la actualización
+    if (result.success) {
+      navigate("/notes");
+    } else if (result.conflict) {
+      navigate(`/notes/${result.note_id}/resolve-conflict`);
+    } else {
+      alert("Error al actualizar la nota.");
+    }
+
+
     return result;
   };
 

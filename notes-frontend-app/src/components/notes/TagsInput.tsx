@@ -1,24 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { TextField, Chip, Box } from "@mui/material";
 import { useDispatch } from "react-redux";
-import { updateNoteTags } from "../../redux/actions/notes/notes";
 
 interface TagsInputProps {
-  noteId: number;
   currentTags: string[];
   onChange: (tags: string[]) => void;
-  textColor: string; // Recibe el color de texto dinámico
+  textColor: string;
+  viewMode: boolean; // Recibe el color de texto dinámico
 }
 
 const TagsInput: React.FC<TagsInputProps> = ({
-  noteId,
   currentTags,
   onChange,
   textColor,
+  viewMode,
 }) => {
   const [tags, setTags] = useState<string[]>(currentTags || []);
   const [inputValue, setInputValue] = useState<string>("");
-  const dispatch = useDispatch();
 
   useEffect(() => {
     setTags(currentTags || []);
@@ -27,17 +25,16 @@ const TagsInput: React.FC<TagsInputProps> = ({
   const handleAddTag = () => {
     if (inputValue.trim() && !tags.includes(inputValue)) {
       const updatedTags = [...tags, inputValue.trim()];
-      setTags(updatedTags);
-      dispatch(updateNoteTags(noteId, updatedTags));
-      onChange(updatedTags);
+      setTags(updatedTags); // actualiza loca
+      onChange(updatedTags); //actualiza estado padre
       setInputValue("");
     }
   };
 
   const handleDeleteTag = (tagToDelete: string) => {
     const updatedTags = tags.filter((tag) => tag !== tagToDelete);
-    setTags(updatedTags);
-    dispatch(updateNoteTags(noteId, updatedTags));
+    setTags(updatedTags); //actualiza estado local
+    onChange(updatedTags); //actualiza estado padre
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -55,6 +52,7 @@ const TagsInput: React.FC<TagsInputProps> = ({
         onChange={(e) => setInputValue(e.target.value)}
         onKeyDown={handleKeyDown}
         fullWidth
+        disabled={viewMode}
         margin="normal"
         InputLabelProps={{ style: { color: textColor } }}
         InputProps={{
@@ -66,14 +64,15 @@ const TagsInput: React.FC<TagsInputProps> = ({
           <Chip
             key={tag}
             label={tag}
+            disabled={viewMode}
             onDelete={() => handleDeleteTag(tag)}
             sx={{
               color: textColor,
               border: `1px solid ${textColor}`,
               backgroundColor: "transparent",
               "&:hover": {
-                backgroundColor: textColor,
-                color: "#fff",
+                backgroundColor: "#1976d2", // Azul predeterminado de MUI (primary.main)
+                color: textColor,
               },
             }}
           />
