@@ -47,6 +47,7 @@ const ResolveConflict = () => {
   }, [conflict]);
 
   const handleResolve = () => {
+    debugger;
     const noteToSave =
       selectedVersion === "server"
         ? { ...conflict.serverVersion, version: conflict.serverVersion.version }
@@ -101,7 +102,9 @@ const ResolveConflict = () => {
             title="Información Guardada"
             initialData={conflict.serverVersion}
             selected={selectedVersion === "server"}
+            onSubmit={() => setSelectedVersion("server")}
             onClick={() => setSelectedVersion("server")}
+
           />
 
           {/* Cambios Recientes */}
@@ -109,6 +112,7 @@ const ResolveConflict = () => {
             title="Cambios Recientes"
             initialData={conflict.clientVersion}
             selected={selectedVersion === "client"}
+            onSubmit={() => setSelectedVersion("client")}
             onClick={() => setSelectedVersion("client")}
           />
 
@@ -119,6 +123,11 @@ const ResolveConflict = () => {
             mode="edit"
             autoSave={true}
             selected={selectedVersion === "merged"}
+            onSubmit={(data) => {
+              setSelectedVersion("merged");
+              console.log("Merged data", data);
+              setMergedNote(data);
+            }}
             onClick={() => setSelectedVersion("merged")}
           />
         </Box>

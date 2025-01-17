@@ -6,6 +6,7 @@ const SelectableBox = ({
   title,
   initialData,
   selected,
+  onSubmit,
   onClick,
   mode = "view",
   autoSave = false,
@@ -48,6 +49,7 @@ const SelectableBox = ({
         mode={mode}
         autoSave={autoSave}
         showSubmitButton={showSubmitButton}
+        onSubmit={onSubmit}
         sx={{
           backgroundColor: selected ? "#dceefb" : "#ffffff",
           padding: "8px",
