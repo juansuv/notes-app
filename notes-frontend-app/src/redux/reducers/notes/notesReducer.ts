@@ -80,6 +80,7 @@ const notesReducer = (state = initialState, action: any): NotesState => {
         ...state,
         conflict: null, // Limpiamos el conflicto manualmente
       };
+
     default:
       return state;
   }

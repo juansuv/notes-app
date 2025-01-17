@@ -1,5 +1,6 @@
 import axios from "axios";
 import { LOGIN_USER_SUCCESS, LOGIN_USER_FAILURE } from "./types";
+import { startSessionTimer } from "../../../utils/sessionUtils";
 
 export const loginUser =
   (username: string, password: string) => async (dispatch: any) => {
@@ -24,9 +25,13 @@ export const loginUser =
       if (res.status === 200) {
 
 
-        localStorage.setItem("access_token", res.data.access_token);
-        localStorage.setItem("username", res.data.username);
-        localStorage.setItem("token_type", res.data.token_type);
+        sessionStorage.setItem("token", res.data.token);
+        sessionStorage.setItem("username", res.data.username);
+        sessionStorage.setItem("token_type", res.data.token_type);
+        
+        const expirationTime = new Date().getTime() + res.data.tokenExpiration * 1000 * 60;
+        sessionStorage.setItem("tokenExpiration", expirationTime.toString());
+        startSessionTimer(expirationTime);
 
         dispatch({
           type: LOGIN_USER_SUCCESS,

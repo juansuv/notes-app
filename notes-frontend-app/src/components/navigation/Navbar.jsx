@@ -75,7 +75,7 @@ function Navbar({ isAuthenticated, username, logoutUser }) {
 }
 
 const mapStateToProps = (state) => ({
-  isAuthenticated: !!state.auth.access_token, // Verifica si el usuario está autenticado
+  isAuthenticated: !!state.auth.token, // Verifica si el usuario está autenticado
   username: state.auth.username, // Recupera el nombre de usuario
 });
 

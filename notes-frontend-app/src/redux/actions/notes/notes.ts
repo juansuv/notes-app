@@ -20,7 +20,7 @@ export const createNoteSuccess = (note) => ({
 
 export const createNote = (note) => async (dispatch, getState) => {
   const state = getState();
-  const token = state.auth.access_token;
+  const token = state.auth.token;
   const token_type = state.auth.token_type;
   const apiUrl = import.meta.env.VITE_APP_NOTE_API_URL;
 
@@ -32,10 +32,10 @@ export const createNote = (note) => async (dispatch, getState) => {
     });
     console.log("creonota" );
     dispatch(createNoteSuccess(response.data));
-    debugger;
+    
     return { success: true };
   } catch (error) {
-    debugger;
+    
     console.error("Error al crear la nota:", error);
   }
 };
@@ -43,7 +43,7 @@ export const createNote = (note) => async (dispatch, getState) => {
 // actions/notes/notes.ts
 export const updateNote = (note) => async (dispatch, getState) => {
   const state = getState();
-  const token = state.auth.access_token;
+  const token = state.auth.token;
   const apiUrl = import.meta.env.VITE_APP_NOTE_API_URL;
 
   console.log("note", note);
@@ -70,7 +70,7 @@ export const updateNote = (note) => async (dispatch, getState) => {
           clientVersion: error.response.data.detail.client_version,
         },
       });
-      debugger;
+      
       return { conflict: true, note_id: error.response.data.detail.server_version.id };
     } else {
       console.error("Error al actualizar la nota:", error);
@@ -87,7 +87,7 @@ export const clearConflict = () => ({
 
 export const deleteNote = (id) => async (dispatch, getState) => {
   const state = getState();
-  const token = state.auth.access_token;
+  const token = state.auth.token;
   const apiUrl = import.meta.env.VITE_APP_NOTE_API_URL;
 
   try {
@@ -126,7 +126,7 @@ export const fetchNotesFailure = (error: string) => ({
 // Acción asíncrona para obtener las notas desde el backend
 export const fetchNotes = () => async (dispatch: any, getState: any) => {
   const state = getState();
-  const token = state.auth.access_token;
+  const token = state.auth.token;
   const token_type = state.auth.token_type;
   const apiUrl = import.meta.env.VITE_APP_NOTE_API_URL;
 

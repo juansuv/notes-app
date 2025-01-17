@@ -4,6 +4,11 @@ from app.crud.user import create_user, get_user_by_username
 from app.schemas.user import UserCreate, UserResponse, UserLogin
 from app.utils.authentication import create_access_token, verify_password
 from app.config.db import get_db
+import os
+
+from dotenv import load_dotenv
+load_dotenv()
+
 
 router = APIRouter()
 
@@ -32,5 +37,6 @@ async def login_user(userLogin: UserLogin, db: AsyncSession = Depends(get_db)):
     db_user = await get_user_by_username(db, userLogin.username)
     if not db_user or not verify_password(userLogin.password, db_user.password):
         raise HTTPException(status_code=400, detail="Invalid credentials")
-    access_token = create_access_token(data={"sub": db_user.username})
-    return {"access_token": access_token, "token_type": "bearer", "username": db_user.username}
+    token = create_access_token(data={"sub": db_user.username})
+    print(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
+    return {"token": token, "token_type": "bearer", "username": db_user.username, "tokenExpiration": os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES")}

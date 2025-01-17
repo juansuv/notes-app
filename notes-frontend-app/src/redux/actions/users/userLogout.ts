@@ -3,8 +3,8 @@ import { LOGOUT_USER } from "./types";
 
 export const logoutUser = () => {
   
-  localStorage.removeItem("access_token");
-  localStorage.removeItem("username");
+  sessionStorage.removeItem("token");
+  sessionStorage.removeItem("username");
   return {
     type: LOGOUT_USER,
   };

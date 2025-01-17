@@ -47,7 +47,6 @@ const ResolveConflict = () => {
   }, [conflict]);
 
   const handleResolve = () => {
-    debugger;
     const noteToSave =
       selectedVersion === "server"
         ? { ...conflict.serverVersion, version: conflict.serverVersion.version }
