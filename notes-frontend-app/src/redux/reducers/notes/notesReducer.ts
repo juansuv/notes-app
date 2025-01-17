@@ -8,6 +8,8 @@ import {
   DELETE_NOTE_SUCCESS,
   UPDATE_NOTE_CONFLICT,
   CLEAR_CONFLICT,
+  UPDATE_NOTE_TAGS,
+  UPDATE_NOTE_COLOR,
 } from "../../actions/notes/types";
 
 interface NotesState {
@@ -79,6 +81,25 @@ const notesReducer = (state = initialState, action: any): NotesState => {
       return {
         ...state,
         conflict: null, // Limpiamos el conflicto manualmente
+      };
+
+    case UPDATE_NOTE_TAGS:
+      return {
+        ...state,
+        notes: state.notes.map((note) =>
+          note.id === action.payload.noteId
+            ? { ...note, tags: action.payload.tags }
+            : note
+        ),
+      };
+    case UPDATE_NOTE_COLOR:
+      return {
+        ...state,
+        notes: state.notes.map((note) =>
+          note.id === action.payload.noteId
+            ? { ...note, color: action.payload.color }
+            : note
+        ),
       };
 
     default:
