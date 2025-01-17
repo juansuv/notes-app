@@ -86,7 +86,7 @@ async def edit_note(
         elif result["error"] == "Conflict detected. The note was modified by another user.":
             raise HTTPException(
                 status_code=409,
-                detail=result["error"]
+                detail=result
             )
 
     # Si no hay error, devuelve la nota actualizada

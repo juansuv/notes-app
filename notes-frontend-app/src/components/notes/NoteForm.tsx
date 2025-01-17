@@ -1,25 +1,54 @@
 import React, { useState, useEffect } from "react";
 import { Box, Typography, TextField, Button, Paper } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
-const NoteForm = ({ initialData = { title: "", content: "", version:"" }, onSubmit, mode }) => {
+const NoteForm = ({
+  initialData = { title: "", content: "", version: "" },
+  onSubmit,
+  mode = "edit", // Modo predeterminado: editar
+  autoSave = false, //solo activado para combinar notas
+  showSubmitButton = true, 
+  viewNote = "Ver Nota",
+}) => {
   const [title, setTitle] = useState(initialData.title);
   const [content, setContent] = useState(initialData.content);
-  const version = initialData.version;
-  const handleSubmit = (e) => {
+  const [version, setVersion] = useState(initialData.version);
+  const navigate = useNavigate();
+
+  //actualiza input con los datos de la nota inicial
+  useEffect(() => {
+    if (mode !== "create") {
+      console.log("actualizando datos iniciales", initialData);
+      setTitle(initialData.title);
+      setContent(initialData.content);
+      setVersion(initialData.version);
+    }
+  }, [initialData, mode]);
+
+  //maneja el envio del formulario
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!title.trim() || !content.trim()) {
       alert("Por favor completa todos los campos.");
       return;
     }
-    onSubmit({ title, content, version }); // Llama al callback `onSubmit`
+    console.log(
+      "Enviando datos del formulario con version",
+      title,
+      content,
+      version
+    );
+    const result = await onSubmit({ title, content, version });
+    if (result?.conflict) {
+      navigate(`/notes/${result.note_id}/resolve-conflict`); // Redirige inmediatamente
+    } else if (result?.success) {
+      navigate(`/notes`); // Redirige a la lista de notas
+    } else {
+      alert("Error al actualizar la nota.");
+    } // Llama al callback `onSubmit`
   };
 
-  useEffect(() => {
-    if (initialData.title || initialData.content) {
-      setTitle(initialData.title);
-      setContent(initialData.content);
-    }
-  }, [initialData]);
+  const isViewMode = mode === "view"; // Verifica si el modo es 'view'
 
   return (
     <Box
@@ -27,10 +56,9 @@ const NoteForm = ({ initialData = { title: "", content: "", version:"" }, onSubm
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        minHeight: "calc(100vh - 64px - 64px)", // Resta el espacio del Navbar y Footer
         padding: 2,
         width: "100vw", // 100% del viewport
-        maxWidth: "100%"
+        maxWidth: "100%",
       }}
     >
       <Paper
@@ -40,15 +68,13 @@ const NoteForm = ({ initialData = { title: "", content: "", version:"" }, onSubm
           width: "100%",
           padding: 4,
           borderRadius: "16px",
+
         }}
       >
         <Typography variant="h5" sx={{ marginBottom: 2, fontWeight: "bold" }}>
-          {mode === "create" ? "Crear Nueva Nota" : "Editar Nota"}
+          {viewNote}
         </Typography>
 
-        <Typography variant="h5" sx={{ marginBottom: 2, fontWeight: "bold" }}>
-          { `version: ${initialData.version}` }
-        </Typography>
         <Box
           component="form"
           onSubmit={handleSubmit}
@@ -59,8 +85,15 @@ const NoteForm = ({ initialData = { title: "", content: "", version:"" }, onSubm
             variant="outlined"
             fullWidth
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            onChange={(e) => {
+              setTitle(e.target.value);
+              if (autoSave) {
+                const updatedData = { ...initialData, title: e.target.value };
+                onSubmit(updatedData);
+              }
+            }}
             required
+            disabled={isViewMode} // Deshabilitado si está en modo 'view'
           />
           <TextField
             label="Contenido"
@@ -69,16 +102,21 @@ const NoteForm = ({ initialData = { title: "", content: "", version:"" }, onSubm
             multiline
             rows={6}
             value={content}
-            onChange={(e) => setContent(e.target.value)}
+            onChange={(e) => {
+              setContent(e.target.value);
+              if (autoSave) {
+                const updatedData = { ...initialData, content: e.target.value };
+                onSubmit(updatedData);
+              }
+            }}
             required
+            disabled={isViewMode} // Deshabilitado si está en modo 'view'
           />
-          <Button
-            type="submit"
-            variant="contained"
-            sx={{ marginTop: 2 }}
-          >
-            {mode === "create" ? "Guardar Nota" : "Guardar Cambios"}
-          </Button>
+          {!isViewMode && showSubmitButton && (
+            <Button type="submit" variant="contained" sx={{ marginTop: 2 }}>
+              {mode === "create" ? "Guardar Nota" : "Guardar Cambios"}
+            </Button>
+          )}
         </Box>
       </Paper>
     </Box>

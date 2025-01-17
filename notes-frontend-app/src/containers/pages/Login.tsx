@@ -14,7 +14,7 @@ const Login = () => {
   const [password, setPassword] = useState(""); // Estado para la contraseña
   
   const dispatch = useDispatch(); // Hook para despachar acciones
-  const { access_token, error } = useSelector((state: any) => state.auth); // Accede al estado global de Redux
+  const { token, error } = useSelector((state: any) => state.auth); // Accede al estado global de Redux
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,7 +23,8 @@ const Login = () => {
 
   const navigate = useNavigate();
 
-  if (access_token) {
+  if (token) {
+    
     navigate("/notes");
   }
 
@@ -125,8 +126,8 @@ const Login = () => {
               </Button>
             </Box>
 
-            {/* Mostrar access_token o error */}
-            {access_token && (
+            {/* Mostrar token o error */}
+            {token && (
               <Typography
                 variant="body2"
                 sx={{

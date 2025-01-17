@@ -10,7 +10,22 @@ import Register from "./containers/pages/Register";
 import ProtectedRoute from "./components/routers/ProtectedRoute";
 import NewNote from "./containers/pages/notes/NewNote";
 import NoteDetails from "./containers/pages/notes/NoteDetails";
+import ResolveConflict from "./containers/pages/notes/ResolveConflict";
+import { useEffect } from "react";
+import { checkSessionValidity } from "./utils/sessionUtils";
+
 function App() {
+
+  useEffect(() => {
+    // Ejecuta solo una vez al inicio
+    const sessionExpired = checkSessionValidity();
+    if (sessionExpired) {
+      console.log("Sesión expirada, cerrando sesión...");
+    } else {
+      console.log("Sesión válida, configurando temporizador...");
+    }
+  }, []);
+  
   return (
     <Provider store={store}>
       <Router>
@@ -46,6 +61,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <NoteDetails />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/notes/:id/resolve-conflict"
+            element={
+              <ProtectedRoute>
+                <ResolveConflict />
               </ProtectedRoute>
             }
           />

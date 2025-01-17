@@ -26,7 +26,7 @@ import {
   // Acción asíncrona para obtener las notas desde el backend
   export const fetchNotes = () => async (dispatch: any, getState: any) => {
     const state = getState();
-    const token = state.auth.access_token;
+    const token = state.auth.token;
     const token_type = state.auth.token_type;
     const apiUrl = import.meta.env.VITE_APP_NOTE_API_URL;
 

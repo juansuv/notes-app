@@ -4,15 +4,10 @@ from app.models.note import Note
 from app.schemas.note import NoteCreate
 from sqlalchemy.sql.expression import any_
 
-
-
 async def create_note(db: AsyncSession, note: NoteCreate, user_id: int):
     print(note.shared_with)
     db_note = Note(
-        **note.model_dump(),
-        owner_id=user_id,
-        version=1,
-        last_edited_by=user_id
+        **note.model_dump(), owner_id=user_id, version=1, last_edited_by=user_id
     )
     db.add(db_note)
     await db.commit()
@@ -41,21 +36,34 @@ async def get_all_notes(db: AsyncSession):
     return result.scalars().all()
 
 
-async def update_note(db: AsyncSession, note_id: int, user_id: int, updated_note: NoteCreate, version: int):
+async def update_note(
+    db: AsyncSession, note_id: int, user_id: int, updated_note: NoteCreate, version: int
+):
     # Verifica si la nota existe y si el usuario tiene permisos
     result = await db.execute(
         select(Note).where(
-            (Note.id == note_id) & ((Note.owner_id == user_id) | (user_id == any_(Note.shared_with)))
+            (Note.id == note_id)
+            & ((Note.owner_id == user_id) | (user_id == any_(Note.shared_with)))
         )
     )
     note = result.scalar_one_or_none()
     if not note:
         return {"error": "Note not found or unauthorized"}
-
     # Verifica si la versión coincide
     if note.version != version:
-        return {"error": "Conflict detected. The note was modified by another user."}
-
+        return {
+            "error": "Conflict detected. The note was modified by another user.",
+            "server_version": {
+                "id": note.id,
+                "version": note.version,
+                "title": note.title,
+                "content": note.content,
+            },
+            "client_version": {
+                "title": updated_note.title,
+                "content": updated_note.content,
+            },
+        }
 
     # Actualiza los campos de la nota
     note.title = updated_note.title
@@ -82,8 +90,12 @@ async def delete_note(db: AsyncSession, note_id: int, user_id: int):
     return True
 
 
-async def share_note(db: AsyncSession, note_id: int, user_id: int, shared_with: list[int]):
-    result = await db.execute(select(Note).where(Note.id == note_id, Note.owner_id == user_id))
+async def share_note(
+    db: AsyncSession, note_id: int, user_id: int, shared_with: list[int]
+):
+    result = await db.execute(
+        select(Note).where(Note.id == note_id, Note.owner_id == user_id)
+    )
     note = result.scalar_one_or_none()
     if not note:
         return None  # Nota no encontrada o no autorizada

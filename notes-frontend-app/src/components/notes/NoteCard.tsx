@@ -13,7 +13,7 @@ const NoteCard = ({ note, onView, onEdit, onDelete }) => {
     <Card
       sx={{
         minHeight: 200, // Altura mínima para mantener los botones visibles
-        backgroundColor: "#FFF9C4",
+        backgroundColor: note?.color || "#ffffff",
         boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.2)",
         borderRadius: "12px",
         display: "flex",
