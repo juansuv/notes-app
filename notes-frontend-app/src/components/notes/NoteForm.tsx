@@ -8,12 +8,11 @@ const NoteForm = ({
   mode = "edit", // Modo predeterminado: editar
   autoSave = false, //solo activado para combinar notas
   showSubmitButton = true, 
-
+  viewNote = "Ver Nota",
 }) => {
   const [title, setTitle] = useState(initialData.title);
   const [content, setContent] = useState(initialData.content);
   const [version, setVersion] = useState(initialData.version);
-
   const navigate = useNavigate();
 
   //actualiza input con los datos de la nota inicial
@@ -57,7 +56,6 @@ const NoteForm = ({
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        minHeight: "calc(100vh - 64px - 64px)", // Resta el espacio del Navbar y Footer
         padding: 2,
         width: "100vw", // 100% del viewport
         maxWidth: "100%",
@@ -70,24 +68,12 @@ const NoteForm = ({
           width: "100%",
           padding: 4,
           borderRadius: "16px",
+
         }}
       >
         <Typography variant="h5" sx={{ marginBottom: 2, fontWeight: "bold" }}>
-          {mode === "create"
-            ? "Crear Nueva Nota"
-            : mode === "view"
-            ? "Ver Nota"
-            : "Editar Nota"}
+          {viewNote}
         </Typography>
-
-        {version && (
-          <Typography
-            variant="body2"
-            sx={{ marginBottom: 2, color: "text.secondary" }}
-          >
-            Versión: {version}
-          </Typography>
-        )}
 
         <Box
           component="form"

@@ -16,7 +16,7 @@ const CreateNote = () => {
   return (
     <Layout>
       <Navbar />
-      <NoteForm onSubmit={handleCreate} mode="create" />
+      <NoteForm onSubmit={handleCreate} mode="create" viewNote="Crear Nota" />
     </Layout>
   );
 };
