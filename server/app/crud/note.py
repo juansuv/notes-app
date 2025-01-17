@@ -58,16 +58,25 @@ async def update_note(
                 "version": note.version,
                 "title": note.title,
                 "content": note.content,
+                "tags": note.tags,
+                "color": note.color,
+                "shared_with": note.shared_with,
             },
             "client_version": {
                 "title": updated_note.title,
                 "content": updated_note.content,
+                "tags": updated_note.tags,
+                "color": updated_note.color,
+                "shared_with": note.shared_with,
             },
         }
 
     # Actualiza los campos de la nota
     note.title = updated_note.title
     note.content = updated_note.content
+    note.tags = updated_note.tags  # Actualiza las etiquetas
+    note.color = updated_note.color
+    note.shared_with = updated_note.shared_with
     note.version += 1  # Incrementa la versión
     note.last_edited_by = user_id
     await db.commit()

@@ -11,6 +11,9 @@ class Note(Base):
     content = Column(Text, nullable=False)
     created_at = Column(TIMESTAMP(timezone=True), default=datetime.now(timezone.utc))
     updated_at = Column(TIMESTAMP(timezone=True), default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
+    
+    tags = Column(ARRAY(String), default=[])  # Campo para etiquetas
+    color = Column(String, nullable=True)
 
     # Relación con el usuario dueño de la nota
     owner_id = Column(Integer, ForeignKey("user.id"))
