@@ -39,7 +39,7 @@ const Register = () => {
 
 
 
-    console.log("Register submitted");
+    ("Register submitted");
     if (result.success) {
       setMessage("Usuario creado exitosamente");
       setName("");

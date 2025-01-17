@@ -11,9 +11,9 @@ export const registerUser = async (name: string, password: string) => {
 
   try {
     const apiUrl = import.meta.env.VITE_APP_NOTE_API_URL;
-    console.log(apiUrl);
-    console.log(name);
-    console.log(password);
+    (apiUrl);
+    (name);
+    (password);
     const res = await axios.post(`${apiUrl}/api/auth/register`, body, config);
 
     if (res.status === 200) {
@@ -22,7 +22,7 @@ export const registerUser = async (name: string, password: string) => {
       return { success: false, data: res.data };
     }
   } catch (error: any) {
-    console.log("Register submitted", error);
+    ("Register submitted", error);
 
     if (error.response?.status === 409) {
       return {

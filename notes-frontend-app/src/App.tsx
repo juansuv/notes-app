@@ -20,9 +20,9 @@ function App() {
     // Ejecuta solo una vez al inicio
     const sessionExpired = checkSessionValidity();
     if (sessionExpired) {
-      console.log("Sesión expirada, cerrando sesión...");
+      ("Sesión expirada, cerrando sesión...");
     } else {
-      console.log("Sesión válida, configurando temporizador...");
+      ("Sesión válida, configurando temporizador...");
     }
   }, []);
   

@@ -36,6 +36,7 @@ const notesReducer = (state = initialState, action: any): NotesState => {
       };
 
     case FETCH_NOTES_SUCCESS:
+      ("obtiene nota de la bd con ", action.payload);
       return {
         ...state,
         loading: false,
@@ -70,7 +71,7 @@ const notesReducer = (state = initialState, action: any): NotesState => {
         notes: state.notes.filter((note) => note.id !== action.payload),
       };
     case UPDATE_NOTE_CONFLICT:
-      console.log("conflict save in locale storage", action.payload);
+      ("conflict save in locale storage", action.payload);
       localStorage.setItem("conflict", JSON.stringify(action.payload));
       return {
         ...state,
@@ -84,19 +85,22 @@ const notesReducer = (state = initialState, action: any): NotesState => {
       };
 
     case UPDATE_NOTE_TAGS:
+      ("update tags", action.payload);
       return {
         ...state,
         notes: state.notes.map((note) =>
-          note.id === action.payload.noteId
+          note.id === parseInt(action.payload.noteId)
             ? { ...note, tags: action.payload.tags }
             : note
         ),
       };
     case UPDATE_NOTE_COLOR:
+      ("update tags", action.payload);
+      ("update noteid", action.payload.noteId);
       return {
         ...state,
         notes: state.notes.map((note) =>
-          note.id === action.payload.noteId
+          note.id === parseInt(action.payload.noteId)
             ? { ...note, color: action.payload.color }
             : note
         ),

@@ -12,29 +12,36 @@ const NoteDetails = () => {
   const navigate = useNavigate();
 
   const { notes, loading } = useSelector((state) => state.notes);
-  const note = notes.find((n) => n.id === parseInt(id)); // Buscamos la nota específica
+  const note = notes.find((note) => note.id === parseInt(id)); // Buscamos la nota específica
 
   const [initialData, setInitialData] = useState({
     title: "",
     content: "",
-    version: ""
+    version: "",
+    tags: [],
+    color: "#ffffff",
   });
 
   useEffect(() => {
     if (!notes.length) {
       dispatch(fetchNotes()); // Si no hay notas cargadas, las buscamos
     } else if (note) {
+      ("note initialdata", note);
       setInitialData({
         title: note.title,
         content: note.content,
-        version: note.version
+        version: note.version,
+        tags: note.tags,
+        color: note.color,
       });
     }
   }, [dispatch, notes, note]);
 
   const handleSubmit = async (updatedNote) => {
-    const result = await dispatch(updateNote({ ...updatedNote, id, version:note.version })); // Actualizamos la nota en Redux
-    return result; 
+    const result = await dispatch(
+      updateNote({ ...updatedNote, id, version: note.version })
+    ); // Actualizamos la nota en Redux
+    return result;
   };
 
   if (loading || !note) {
@@ -52,7 +59,8 @@ const NoteDetails = () => {
       <NoteForm
         initialData={initialData}
         onSubmit={handleSubmit}
-        mode="edit" // Indicamos que es un modo de edición
+        mode="edit"
+        id={id}
       />
     </Layout>
   );

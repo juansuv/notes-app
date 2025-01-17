@@ -32,7 +32,7 @@ export const createNote = (note) => async (dispatch, getState) => {
         Authorization: `${token_type} ${token}`,
       },
     });
-    console.log("creonota" );
+    ("creonota" );
     dispatch(createNoteSuccess(response.data));
     
     return { success: true };
@@ -48,15 +48,15 @@ export const updateNote = (note) => async (dispatch, getState) => {
   const token = state.auth.token;
   const apiUrl = import.meta.env.VITE_APP_NOTE_API_URL;
 
-  console.log("note", note);
+  ("note", note);
   try {
-    console.log("nota enviada a actualizar", note);
+    ("nota enviada a actualizar", note);
     const response = await axios.put(`${apiUrl}/api/notes/${note.id}`, note, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log("response", response.data);
+    ("response", response.data);
     dispatch({
       type: UPDATE_NOTE_SUCCESS,
       payload: response.data,

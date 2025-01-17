@@ -7,7 +7,6 @@ export const logout = () => {
 };
 export const startSessionTimer = (expirationTime: number) => {
   const timeRemaining = expirationTime - new Date().getTime(); // Diferencia en milisegundos
-  debugger;
   if (timeRemaining > 0) {
     setTimeout(() => {
       logout(); // Cierra sesión cuando el token expire
@@ -19,7 +18,6 @@ export const startSessionTimer = (expirationTime: number) => {
 
 // Verificar validez de la sesión al iniciar la app
 export const checkSessionValidity = () => {
-  debugger;
   const tokenExpiration = sessionStorage.getItem("tokenExpiration");
   const expirationTime = tokenExpiration ? parseInt(tokenExpiration, 10) : 0;
   if (!expirationTime || new Date().getTime() > expirationTime) {

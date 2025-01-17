@@ -44,7 +44,7 @@ const Notes = () => {
             justifyContent: "space-between",
             alignItems: "center",
             marginBottom: 2,
-            width: "95vw",
+            width: "100%",
             paddingTop: "64px", // Ajusta según la altura de tu Navbar
           }}
         >

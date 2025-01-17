@@ -124,7 +124,7 @@ const ResolveConflict = () => {
             selected={selectedVersion === "merged"}
             onSubmit={(data) => {
               setSelectedVersion("merged");
-              console.log("Merged data", data);
+              ("Merged data", data);
               setMergedNote(data);
             }}
             onClick={() => setSelectedVersion("merged")}
