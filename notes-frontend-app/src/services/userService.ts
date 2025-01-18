@@ -11,9 +11,7 @@ export const registerUser = async (name: string, password: string) => {
 
   try {
     const apiUrl = import.meta.env.VITE_APP_NOTE_API_URL;
-    (apiUrl);
-    (name);
-    (password);
+
     const res = await axios.post(`${apiUrl}/api/auth/register`, body, config);
 
     if (res.status === 200) {
@@ -22,7 +20,6 @@ export const registerUser = async (name: string, password: string) => {
       return { success: false, data: res.data };
     }
   } catch (error: any) {
-    ("Register submitted", error);
 
     if (error.response?.status === 409) {
       return {
@@ -30,7 +27,13 @@ export const registerUser = async (name: string, password: string) => {
         message: "El usuario ya está registrado.",
       };
     }
-
+    else if (error.response?.status === 422) {
+      console.log(error.response.data.errors[0].error.replace(/^Value error, /, ""))
+      return {
+        success: false,
+        message: `${error.response.data.errors[0].error.replace(/^Value error, /, "")}`
+      };
+    }
     return {
       success: false,
       message: error.response?.data || "Error al registrar usuario",

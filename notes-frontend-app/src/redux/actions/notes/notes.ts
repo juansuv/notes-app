@@ -14,7 +14,6 @@ import {
   UPDATE_NOTE_COLOR,
 } from "./types";
 
-
 export const createNoteSuccess = (note) => ({
   type: CREATE_NOTE_SUCCESS,
   payload: note,
@@ -33,11 +32,15 @@ export const createNote = (note) => async (dispatch, getState) => {
       },
     });
     dispatch(createNoteSuccess(response.data));
-    
+
     return { success: true };
   } catch (error) {
-    
-    console.error("Error al crear la nota:", error);
+    if (axios.isAxiosError(error) && error.response?.status === 422) {
+      return { error: error.response.data.errors };
+    } else {
+      console.error("Error al crear la nota:", error);
+      return { success: false };
+    }
   }
 };
 
@@ -47,7 +50,6 @@ export const updateNote = (note) => async (dispatch, getState) => {
   const token = state.auth.token;
   const apiUrl = import.meta.env.VITE_APP_NOTE_API_URL;
   try {
-
     const response = await axios.put(`${apiUrl}/api/notes/${note.id}`, note, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -68,16 +70,19 @@ export const updateNote = (note) => async (dispatch, getState) => {
           clientVersion: error.response.data.detail.client_version,
         },
       });
-      
-      return { conflict: true, note_id: error.response.data.detail.server_version.id };
+
+      return {
+        conflict: true,
+        note_id: error.response.data.detail.server_version.id,
+      };
+    } else if (axios.isAxiosError(error) && error.response?.status === 422) {
+      return { error: error.response.data.errors };
     } else {
-      console.error("Error al actualizar la nota:", error);
+      console.error("Error al actualizaras la nota:", error);
       return { success: false };
     }
-
   }
 };
-
 
 export const clearConflict = () => ({
   type: CLEAR_CONFLICT,
@@ -139,7 +144,9 @@ export const fetchNotes = () => async (dispatch: any, getState: any) => {
     dispatch(fetchNotesSuccess(response.data));
   } catch (error: unknown) {
     if (error instanceof Error) {
-      dispatch(fetchNotesFailure(error.message || "Error al obtener las notas"));
+      dispatch(
+        fetchNotesFailure(error.message || "Error al obtener las notas")
+      );
     } else {
       dispatch(fetchNotesFailure("Error al obtener las notas"));
     }
@@ -152,7 +159,7 @@ export const updateNoteTags = (noteId: number, tags: string[]) => ({
 });
 
 // Acción para actualizar color
-export const updateNoteColor = (noteId: number, color : string ) => ({
+export const updateNoteColor = (noteId: number, color: string) => ({
   type: UPDATE_NOTE_COLOR,
   payload: { noteId, color },
 });
