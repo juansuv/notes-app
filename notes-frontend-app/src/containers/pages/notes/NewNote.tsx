@@ -4,6 +4,7 @@ import Navbar from "../../../components/navigation/Navbar";
 import NoteForm from "../../../components/notes/NoteForm";
 import { createNote } from "../../../redux/actions/notes/notes";
 import { useNavigate } from "react-router-dom";
+import { error } from "console";
 
 const CreateNote = () => {
   const dispatch = useDispatch();
@@ -16,8 +17,16 @@ const CreateNote = () => {
       navigate("/notes");
     } else if (result.conflict) {
       navigate(`/notes/${result.note_id}/resolve-conflict`);
+    } 
+     else if (result.error) {
+      const errors = Array.isArray(result.error) ? result.error : [result.error];
+      errors.map((err) => {
+        console.log(err.error);
+        alert(err.error.replace(/^Value error, /, ""));
+      });
+
     } else {
-      alert("Error al actualizar la nota.");
+      alert("Error al crear la nota.");
     }
     return result // Redirige a la lista de notas
   };

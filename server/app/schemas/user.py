@@ -1,4 +1,5 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
+
 
 class UserBase(BaseModel):
     """
@@ -11,6 +12,18 @@ class UserBase(BaseModel):
         example="john_doe"
     )
 
+    # Validación personalizada para el nombre de usuario
+    @field_validator("username")
+    def validate_username(cls, value):
+        if len(value.strip()) < 3:
+            raise ValueError("nombre de usuario: Debe tener al menos 3 caracteres.")
+        if len(value.strip()) > 50:
+            raise ValueError("nombre de usuario: No puede superar los 50 caracteres.")
+        if not value.isalnum():
+            raise ValueError("nombre de usuario: Solo puede contener letras y números.")
+        return value
+
+
 class UserCreate(UserBase):
     """
     Esquema para la creación de un nuevo usuario.
@@ -22,12 +35,27 @@ class UserCreate(UserBase):
         example="password123"
     )
 
+    # Validación personalizada para la contraseña
+    @field_validator("password")
+    def validate_password(cls, value):
+        if len(value.strip()) < 8:
+            raise ValueError("contraseña: Debe tener al menos 8 caracteres.")
+        if len(value.strip()) > 30:
+            raise ValueError("contraseña: No puede superar los 30 caracteres.")
+        if not any(char.isdigit() for char in value):
+            raise ValueError("contraseña: Debe contener al menos un número.")
+        if not any(char.isupper() for char in value):
+            raise ValueError("contraseña: Debe contener al menos una letra mayúscula.")
+        return value
+
+
 class UserLogin(UserCreate):
     """
     Esquema para el inicio de sesión de un usuario.
     Extiende `UserCreate`, reutilizando los campos `username` y `password`.
     """
     pass
+
 
 class UserResponse(UserBase):
     """
@@ -40,9 +68,4 @@ class UserResponse(UserBase):
         example=1
     )
 
-    class Config:
-        """
-        Configuración para habilitar compatibilidad con ORM.
-        Esto permite mapear directamente objetos de base de datos a esquemas Pydantic.
-        """
-        orm_mode = True
+    

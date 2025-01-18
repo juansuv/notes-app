@@ -1,80 +1,149 @@
 import pytest
-import asyncio
-from httpx import AsyncClient
-from sqlalchemy.ext.asyncio import AsyncSession
-from app.main import app
-
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqlalchemy.orm import sessionmaker
-from app.models.base import Base
-from uuid import uuid4
-# Motor de base de datos de pruebas (SQLite en memoria)
-SQLALCHEMY_TEST_DATABASE_URL = "postgresql+asyncpg://notes_test_user:Notes123.@localhost/notes_test_app"
-
-
-
-# Crear el motor de pruebas
-engine_test = create_async_engine(SQLALCHEMY_TEST_DATABASE_URL, future=True, echo=False)
-
-# Crear una fábrica de sesiones
-TestSessionLocal = sessionmaker(
-    autocommit=False, autoflush=False, bind=engine_test, class_=AsyncSession
+from app.test.test_config import (
+    init_test_db,
+    override_get_db,
+    TestSessionLocal,
+    test_engine,
 )
+from app.main import app
+from httpx import AsyncClient
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+import asyncio
+from uuid import uuid4
 
-
-# Crear las tablas en la base de datos de pruebas
-async def init_test_db():
-    print(f"Creating tables test dabatabse {SQLALCHEMY_TEST_DATABASE_URL}" )
-    async with engine_test.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-        
-# Dependency override para pruebas
-async def override_get_db():
-    async with TestSessionLocal() as session:
-        yield session
-
-
-
+# Sobrescribir la dependencia `get_db` con una versión de prueba
 app.dependency_overrides["get_db"] = override_get_db
 
 
 @pytest.fixture(scope="session")
 def event_loop():
-    """Crear un nuevo bucle de eventos para las pruebas."""
+    """
+    Crea un nuevo bucle de eventos para las pruebas.
+    Este fixture establece un bucle de eventos a nivel de sesión para permitir
+    el uso de operaciones asíncronas durante los tests.
+    """
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     yield loop
     loop.run_until_complete(loop.shutdown_asyncgens())
-
     loop.close()
 
+
 @pytest.fixture(scope="module", autouse=True)
-async def setup_test_db():
-    # Inicializar la base de datos de pruebas antes de correr las pruebas
+async def setup_test_database():
+    """
+    Inicializa la base de datos de prueba antes de ejecutar los tests.
+    Este fixture se ejecuta automáticamente antes de cualquier prueba del módulo.
+    """
     await init_test_db()
-    yield
-    await engine_test.dispose()
 
 
 @pytest.fixture
 async def client():
-    async with AsyncClient(app=app, base_url="http://test") as ac:
-        yield ac
+    """
+    Proporciona un cliente HTTP asíncrono para interactuar con la aplicación FastAPI.
+    Este cliente se usa para realizar solicitudes HTTP simuladas en los tests.
+    """
+    print("app", app)
+    async with AsyncClient(app=app, base_url="http://test") as client:
+        yield client
+
+
+@pytest.fixture
+async def userFactory(async_session: AsyncSession):
+    """
+    Crea un usuario en la base de datos de prueba.
+    Devuelve el objeto del usuario creado.
+    """
+    from app.crud.user import create_user
+    from app.schemas.user import UserCreate
+
+    print("Creating user")
+    user = UserCreate(username=f"Testuser{uuid4().hex}", password="Testpassword123.")
+    created_user = await create_user(async_session, user)
+    return created_user
+
 
 @pytest.fixture
 async def async_session():
+    """
+    Proporciona una sesión asíncrona de base de datos para ejecutar transacciones
+    en los tests.
+    """
     async for session in override_get_db():
-        try:
-            yield session
-        finally:
-            await session.close()  # Asegura que la conexión se cierre
-            await session.rollback()  # Devuelve la conexión a un estado limpio
-        
+        yield session
+
+
 @pytest.fixture
-async def setup_data(async_session: AsyncSession):
+async def tokenFactory(userFactory):
+    """
+    Genera un token de acceso para un usuario creado por `userFactory`.
+    Retorna un diccionario con el usuario y el token asociado.
+    """
+    from app.utils.authentication import create_access_token
+
+    user = userFactory
+    access_token = create_access_token(data={"sub": user.username})
+    return {"user": user, "token": access_token}
+
+
+@pytest.fixture
+async def otherUserFactory(async_session: AsyncSession):
+    """
+    Crea otro usuario distinto en la base de datos de prueba.
+    Devuelve el objeto del usuario creado.
+    """
     from app.crud.user import create_user
     from app.schemas.user import UserCreate
-    print("Creating user")
-    user = UserCreate(username=f"testuser_{uuid4().hex}", password="testpassword")
+
+    print("Creating other user")
+    user = UserCreate(username=f"other{uuid4().hex}", password="Testpassword123.")
     created_user = await create_user(async_session, user)
     return created_user
+
+
+@pytest.fixture
+async def otherTokenFactory(otherUserFactory):
+    """
+    Genera un token de acceso para un usuario creado por `otherUserFactory`.
+    Retorna un diccionario con el usuario y el token asociado.
+    """
+    from app.utils.authentication import create_access_token
+
+    user = otherUserFactory
+    access_token = create_access_token(data={"sub": user.username})
+    return {"user": user, "token": access_token}
+
+
+@pytest.fixture
+async def setup_notes_data(async_session: AsyncSession):
+    """
+    Configura datos de prueba para notas asociadas a un usuario.
+    - Crea un usuario y tres notas en la base de datos.
+    - Retorna un diccionario con el usuario y las notas creadas.
+
+    Este fixture puede ser usado para validar operaciones CRUD relacionadas con notas.
+    """
+    from app.crud.user import create_user
+    from app.crud.note import create_note
+    from app.schemas.user import UserCreate
+    from app.schemas.note import NoteCreate
+
+    # Crear un usuario
+    user = UserCreate(username=f"user{uuid4().hex}", password="Password123!")
+    created_user = await create_user(async_session, user)
+
+    # Crear notas asociadas al usuario
+    notes = []
+    for i in range(3):  # Crear 3 notas de ejemplo
+        note_data = NoteCreate(
+            title=f"Note {i+1}",
+            content=f"Content of note {i+1}",
+            shared_with=[],
+            tags=["tag1", "tag2"],
+        )
+        note = await create_note(async_session, note_data, user_id=created_user.id)
+        notes.append(note)
+
+    # Retornar el usuario y las notas creadas
+    return {"user": created_user, "notes": notes}

@@ -53,10 +53,17 @@ const NoteDetails = () => {
       navigate("/notes");
     } else if (result.conflict) {
       navigate(`/notes/${result.note_id}/resolve-conflict`);
+    } else if (result.error) {
+      const errors = Array.isArray(result.error)
+        ? result.error
+        : [result.error];
+      errors.map((err) => {
+        console.log(err.error);
+        alert(err.error.replace(/^Value error, /, ""));
+      });
     } else {
       alert("Error al actualizar la nota.");
     }
-
 
     return result;
   };
@@ -77,7 +84,7 @@ const NoteDetails = () => {
         initialData={initialData}
         onSubmit={handleSubmit}
         mode="edit"
-        id={id}
+        viewNote={"Editar Nota"}
       />
     </Layout>
   );

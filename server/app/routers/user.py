@@ -81,7 +81,7 @@ async def login_user(userLogin: UserLogin, db: AsyncSession = Depends(get_db)):
 
     # Verifica si el usuario existe y si la contraseña es válida
     if not db_user or not verify_password(userLogin.password, db_user.password):
-        raise HTTPException(status_code=400, detail="Invalid credentials")
+        raise HTTPException(status_code=401, detail="Invalid credentials")
 
     # Genera un token de acceso JWT
     token = create_access_token(data={"sub": db_user.username})
