@@ -81,8 +81,15 @@ async def get_note(
     - `current_user`: Usuario autenticado.
     """
     note = await get_note_by_id(db, note_id, current_user.id)
-    if not note:
-        raise HTTPException(status_code=404, detail="Note not found")
+
+    # Manejo de errores basados en la clave "error"
+    if "error" in note:
+        if note["error"] == "Note not found":
+            raise HTTPException(status_code=404, detail="Note not found")
+        elif note["error"] == "access denied":
+            raise HTTPException(status_code=403, detail="Permission denied")
+
+    # Si no hay errores, retorna la nota
     return note
 
 

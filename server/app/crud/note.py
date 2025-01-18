@@ -36,21 +36,30 @@ async def get_user_notes(db: AsyncSession, user_id: int):
 
 
 # Recupera una nota específica por su ID
+# Recupera una nota específica por su ID
 async def get_note_by_id(db: AsyncSession, note_id: int, user_id: int):
     """
-    Recupera una nota específica por ID si el usuario tiene acceso.
+    Recupera una nota específica por ID si existe y determina si el usuario tiene acceso.
     - `note_id`: ID de la nota.
     - `user_id`: ID del usuario que solicita la nota.
+
+    Si el usuario no tiene permisos, retorna la nota con un mensaje indicando "Access denied".
     """
-    result = await db.execute(
-        select(Note).where(
-            (Note.id == note_id)  # Coincide con el ID de la nota
-            & (
-                (Note.owner_id == user_id) | (user_id == any_(Note.shared_with))
-            )  # Verifica permisos
-        )
-    )
-    return result.scalar_one_or_none()  # Retorna la nota o None si no se encuentra
+    result = await db.execute(select(Note).where(Note.id == note_id))
+    note = result.scalar_one_or_none()
+
+    if not note:
+        # Si la nota no existe, retorna un objeto con el mensaje correspondiente
+        return {"error": "Note not found"}
+
+    # Verifica si el usuario tiene permisos para acceder a la nota
+    if note.owner_id != user_id and user_id not in note.shared_with:
+        # Retorna la nota con un mensaje de "Access denied"
+        return {"error": "access denied"}
+
+    # Si el usuario tiene acceso, convierte la instancia en un diccionario
+    note_dict = {column.name: getattr(note, column.name) for column in Note.__table__.columns}
+    return note_dict
 
 
 # Obtiene todas las notas en la base de datos

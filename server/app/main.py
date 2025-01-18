@@ -1,4 +1,6 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 from app.config.db import database
 import uvicorn
 from app.routers import user
@@ -9,6 +11,8 @@ from app.routers import note_websocket
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+
 
 # Configurar CORS
 app.add_middleware(
@@ -22,6 +26,24 @@ app.add_middleware(
 app.include_router(user.router, prefix="/api/auth", tags=["Users"])
 app.include_router(note.router, prefix="/api/notes", tags=["Notes"])
 app.include_router(note_websocket.router, tags=["WebSockets"])
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    """
+    Manejador personalizado para errores de validación.
+    """
+    errors = []
+    for error in exc.errors():
+        # Extrae la ubicación y el mensaje del error
+        loc = " -> ".join(str(e) for e in error["loc"])  # Ubicación del campo
+        msg = error["msg"]  # Mensaje de error
+        errors.append({"field": loc, "error": msg})
+    print(errors)
+    return JSONResponse(
+        status_code=422,
+        content={"detail": "Validation error", "errors": errors},
+    )
 
 
 @app.on_event("startup")
