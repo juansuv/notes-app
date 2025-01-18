@@ -33,9 +33,7 @@ function Home() {
             marginBottom: "100px", // Altura exacta del Footer
             overflow: "hidden", // Asegura que el Box respete su posición
           }}
-        >
-          
-        </Box>
+        ></Box>
         <Footer />
       </Box>
     </Layout>

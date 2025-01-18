@@ -6,25 +6,23 @@ import { Box, Button, TextField, Typography, Paper, Grid } from "@mui/material";
 import image from "../../assets/img/banner-login.jpeg"; // Cambia la ruta si es necesario
 import { Link } from "react-router-dom";
 import { loginUser } from "../../redux/actions/users/userLogin"; // Importa la acción de login
+import { AppDispatch } from "../../redux/store"; // Importa el tipo de dispatch
 import { useNavigate } from "react-router-dom";
-
 
 const Login = () => {
   const [username, setUsername] = useState(""); // Estado para el nombre de usuario
   const [password, setPassword] = useState(""); // Estado para la contraseña
-  
-  const dispatch = useDispatch(); // Hook para despachar acciones
-  const { token, error } = useSelector((state: any) => state.auth); // Accede al estado global de Redux
+  const dispatch = useDispatch<AppDispatch>(); // Hook para despachar acciones con el tipo correcto
+  const { token, error } = useSelector((state: { auth: { token: string; error: string } }) => state.auth); // Accede al estado global de Redux
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    dispatch(loginUser(username, password)); // Despacha la acción para iniciar sesión
+    dispatch(loginUser(username, password) as any); // Despacha la acción para iniciar sesión
   };
 
   const navigate = useNavigate();
 
   if (token) {
-    
     navigate("/notes");
   }
 

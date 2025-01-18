@@ -4,6 +4,7 @@ export const loadState = () => {
       const token = sessionStorage.getItem("token");
       const username = sessionStorage.getItem("username");
       const token_type = sessionStorage.getItem("token_type");
+      const tokenExpiration = sessionStorage.getItem("tokenExpiration"); // Añadir tokenExpiration
   
       if (token && username ) {
         return {
@@ -12,6 +13,8 @@ export const loadState = () => {
             token_type: token_type || "bearer", // Opcional: ajustar según el backend
             username,
             error: null,
+            tokenExpiration: tokenExpiration ? Number(tokenExpiration) : null, // Añadir tokenExpiration
+
           },
         };
       }
