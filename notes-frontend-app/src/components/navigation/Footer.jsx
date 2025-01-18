@@ -18,6 +18,7 @@ function Footer() {
         position: "fixed",
         bottom: 0,
         width: "100%",
+        height: 180,
         fontSize: { xs: "0.8rem", sm: "1rem" }
       }}
     >

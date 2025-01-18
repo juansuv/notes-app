@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Box, Typography, TextField, Button, Paper } from "@mui/material";
-import { useNavigate } from "react-router-dom";
 import TagsInput from "./TagsInput";
 import ColorPicker from "./ColorPicker";
 import { adjustColor, getContrastColor } from "../../utils/contrastColor";
@@ -25,10 +24,9 @@ interface NoteFormProps {
   mode?: "edit" | "view" | "create";
   autoSave?: boolean;
   showSubmitButton?: boolean;
-  viewNote?: string;
-
+  viewNote: string;
+  nameCard?: string;
 }
-
 
 const NoteForm: React.FC<NoteFormProps> = ({
   initialData = {
@@ -43,7 +41,6 @@ const NoteForm: React.FC<NoteFormProps> = ({
   showSubmitButton = true,
   viewNote = "Ver Nota",
   autoSave = false,
-
 }) => {
   const [title, setTitle] = useState(initialData.title);
   const [content, setContent] = useState(initialData.content);
@@ -53,11 +50,9 @@ const NoteForm: React.FC<NoteFormProps> = ({
 
   const textColor = getContrastColor(color); // Calcula el color de contraste dinámico
 
-  const navigate = useNavigate();
-
   useEffect(() => {
     if (mode !== "create") {
-      console.log("actualiza los datos el usseefect de la nota")
+      console.log("actualiza los datos el usseefect de la nota");
       setTitle(initialData.title);
       setContent(initialData.content);
       setVersion(initialData.version);
@@ -103,7 +98,6 @@ const NoteForm: React.FC<NoteFormProps> = ({
       alert("Por favor completa los campos titulo y contenido");
       return;
     }
-    console.log("envia la nota al submit con",title, content, version, tags, color )
     onSubmit({ title, content, version, tags, color });
   };
 
@@ -118,6 +112,8 @@ const NoteForm: React.FC<NoteFormProps> = ({
         padding: 2,
         width: "100vw",
         maxWidth: "100%",
+        height: "100%",
+        boxShadow: adjustColor(color, 200),
       }}
     >
       <Paper
@@ -125,29 +121,43 @@ const NoteForm: React.FC<NoteFormProps> = ({
         sx={{
           maxWidth: 600,
           width: "100%",
-          padding: 4,
+          minHeight: 300, // Altura mínima uniforme para todas las tarjetas
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between", // Asegura que el botón esté visible
+          padding: 3,
           borderRadius: "16px",
-          backgroundColor: color,
+          background: `linear-gradient(135deg, ${color || "#f5f5f5"} 40%, ${
+            color ? `${color}b3` : "#e5e5e5"
+          } 100%)`,
+
           color: textColor,
-          transition: "background-color 0.3s, color 0.3s",
+          gap: 2,
         }}
       >
+        {/* Título de la nota */}
         <Typography
           variant="h5"
           sx={{
-            marginBottom: 2,
             fontWeight: "bold",
             textShadow: `0px 0px 4px ${textColor === "#000" ? "#fff" : "#000"}`,
+            textAlign: "center",
           }}
         >
           {viewNote}
         </Typography>
 
+        {/* Formulario de la nota */}
         <Box
           component="form"
           onSubmit={handleSubmit}
-          sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
+          }}
         >
+          {/* Campo del título */}
           <TextField
             label="Título"
             variant="outlined"
@@ -156,27 +166,34 @@ const NoteForm: React.FC<NoteFormProps> = ({
             onChange={(e) => handleFieldChange("title", e.target.value)}
             required
             disabled={isViewMode}
-            InputLabelProps={{ style: { color: textColor } }}
-            InputProps={{
-              style: { color: textColor, borderColor: textColor },
+            InputLabelProps={{
+              style: { color: textColor },
             }}
-          />
-          <TextField
-            label="Contenido"
-            variant="outlined"
-            fullWidth
-            multiline
-            rows={6}
-            value={content}
-            onChange={(e) => handleFieldChange("content", e.target.value)}
-            required
-            disabled={isViewMode}
-            InputLabelProps={{ style: { color: textColor } }}
             InputProps={{
               style: { color: textColor, borderColor: textColor },
             }}
           />
 
+          {/* Campo del contenido */}
+          <TextField
+            label="Contenido"
+            variant="outlined"
+            fullWidth
+            multiline
+            rows={4} // Reduce las filas visibles para compactar
+            value={content}
+            onChange={(e) => handleFieldChange("content", e.target.value)}
+            required
+            disabled={isViewMode}
+            InputLabelProps={{
+              style: { color: textColor },
+            }}
+            InputProps={{
+              style: { color: textColor, borderColor: textColor },
+            }}
+          />
+
+          {/* Componente para las etiquetas */}
           <TagsInput
             currentTags={tags}
             onChange={(updatedTags) => handleFieldChange("tags", updatedTags)}
@@ -184,15 +201,19 @@ const NoteForm: React.FC<NoteFormProps> = ({
             viewMode={isViewMode}
           />
 
+          {/* Selector de color, solo visible si no está en modo de vista */}
           {!isViewMode && (
             <ColorPicker
               currentColor={color}
-              onChange={(updatedColor) => handleFieldChange("color", updatedColor)}
+              onChange={(updatedColor) =>
+                handleFieldChange("color", updatedColor)
+              }
               textColor={textColor}
               viewMode={isViewMode}
             />
           )}
 
+          {/* Botón de guardar, visible solo si no está en modo de vista */}
           {!isViewMode && showSubmitButton && (
             <Button
               type="submit"

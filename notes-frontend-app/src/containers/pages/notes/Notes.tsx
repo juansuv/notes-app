@@ -37,18 +37,41 @@ const Notes = () => {
   return (
     <Layout>
       <Navbar />
-      <Box sx={{ padding: 3 }}>
+      <Box
+        sx={{
+          padding: 3,
+          minHeight: "100vh",
+          minWidth: "100vw",
+          backgroundColor: "#f0f4f8",
+          overflowX: "hidden", // Evita scroll lateral
+          width: "100%", // Asegura que ocupe todo el ancho del dispositivo
+          boxSizing: "border-box", // Incluye el padding en el cálculo del ancho
+        }}
+      >
         <Box
           sx={{
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
             marginBottom: 2,
-            width: "100%",
             paddingTop: "64px", // Ajusta según la altura de tu Navbar
           }}
         >
-          <Typography variant="h4" gutterBottom>
+          <Typography
+            variant="h3"
+            component="h1"
+            sx={{
+              fontFamily: "'Poppins', sans-serif", // Tipografía moderna
+              fontWeight: 600, // Peso de fuente para destacar
+              background: "linear-gradient(90deg, #2196f3, #21cbf3)", // Gradiente suave
+              WebkitBackgroundClip: "text", // Hace que el gradiente afecte solo al texto
+              WebkitTextFillColor: "transparent", // Deja el fondo del texto transparente
+              textAlign: "center", // Centrado
+              marginBottom: "20px", // Espaciado inferior
+              textShadow: "2px 2px 4px rgba(0, 0, 0, 0.2)", // Sombra sutil
+              letterSpacing: "0.05em", // Espaciado entre letras
+            }}
+          >
             Tus Notas
           </Typography>
           <Button
@@ -68,9 +91,16 @@ const Notes = () => {
 
         <Grid
           container
-          spacing={3}
+          spacing={2}
           sx={{
-            minHeight: "calc(100vh - 200px)", // Asegura que haya espacio suficiente
+            width: "100%", // Asegura que el contenedor ocupe todo el ancho
+            margin: "0 auto", // Centra el contenido
+            boxSizing: "border-box", // Incluye padding en el cálculo del ancho
+            overflowX: "hidden",
+            overflowYs: "hidden",
+            paddingBottom: 20,
+            paddingRight: 2,
+            // Evita scroll lateral en el Grid
           }}
         >
           {notes
@@ -83,6 +113,9 @@ const Notes = () => {
                 sm={6} // 2 columnas en pantallas medianas
                 md={4} // 3 columnas en pantallas grandes
                 key={note.id}
+                sx={{
+                  boxSizing: "border-box", // Asegura que respete los márgenes y paddings
+                }}
               >
                 <NoteCard
                   note={note}
@@ -96,8 +129,22 @@ const Notes = () => {
           {/* Relleno de columnas faltantes para mantener siempre 3 columnas */}
           {notes.length < 3 &&
             Array.from({ length: 3 - notes.length }).map((_, index) => (
-              <Grid item xs={12} sm={6} md={4} key={`placeholder-${index}`}>
-                <Box sx={{ height: 200 }} />
+              <Grid
+                item
+                xs={12}
+                sm={6}
+                md={4}
+                key={`placeholder-${index}`}
+                sx={{
+                  boxSizing: "border-box",
+                }}
+              >
+                <Box
+                  sx={{
+                    height: 200,
+                    backgroundColor: "transparent",
+                  }}
+                />
               </Grid>
             ))}
         </Grid>

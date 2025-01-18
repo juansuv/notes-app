@@ -41,10 +41,18 @@ const ResolveConflict = () => {
   useEffect(() => {
     if (conflict) {
       setMergedNote({
-        title: conflict?.serverVersion.title + conflict?.clientVersion.title || "",
-        content: conflict?.serverVersion.content + conflict?.clientVersion.content || "",
+        title:
+          conflict?.serverVersion.title + conflict?.clientVersion.title || "",
+        content:
+          conflict?.serverVersion.content + conflict?.clientVersion.content ||
+          "",
         version: conflict?.serverVersion.version,
-        tags: [...new Set([...(conflict?.serverVersion?.tags), ...(conflict?.clientVersion?.tags)])],
+        tags: [
+          ...new Set([
+            ...conflict?.serverVersion?.tags,
+            ...conflict?.clientVersion?.tags,
+          ]),
+        ],
         color: conflict?.serverVersion.color,
       });
     }
@@ -78,41 +86,64 @@ const ResolveConflict = () => {
   return (
     <Layout>
       <Navbar />
-      <Box sx={{ padding: "32px",   paddingTop: "80px",
-          width: "100vw",
-          paddingLeft: 6,
-          paddingRight: 6,
-          height: "100vh", }}>
-          
-        <Typography variant="h6" color="error" textAlign="center">
+      <Box
+        sx={{
+          padding: 3,
+          paddingTop: "80px",
+          width: "100vw", // Asegura el ancho completo
+          minHeight: "100vh", // Ocupa toda la altura disponible
+          backgroundColor: "#f0f4f8", // Fondo claro
+          boxSizing: "border-box",
+        }}
+      >
+       
+
+        <Typography
+          variant="h4"
+          textAlign="center"
+          color = "error"
+          sx={{
+            fontWeight: "bold",
+            textShadow: "0px 2px 4px rgba(0, 0, 0, 0.3)", // Sombra del texto
+            marginBottom: "8px",
+          }}
+        >
           Conflicto detectado
         </Typography>
-        <Typography textAlign="center" sx={{ marginBottom: 4 }}>
-          Se ha detectado un conflicto. Selecciona una versión o combina las dos.
+        <Typography
+          textAlign="center"
+          sx={{
+            fontSize: "1rem",
+            
+            color: "rgba(73, 61, 61, 0.9)", // Color más claro para contraste
+            textShadow: "0px 2px 2px rgba(0, 0, 0, 0.2)",
+            marginBottom: "20px" // Sombra ligera para el texto secundario
+          }}
+        >
+          Se ha detectado un conflicto. Selecciona una versión o combina las
+          dos.
         </Typography>
 
         <Box
           sx={{
             display: "flex",
-            flexWrap: "wrap",
-            justifyContent: "space-between",
-            gap: 5,
-            
+            flexWrap: "wrap", // Permite que las tarjetas se ajusten a múltiples líneas
+            justifyContent: "center", // Centra las tarjetas horizontalmente
+            gap: 4, // Espaciado uniforme entre tarjetas
           }}
         >
           {/* Información Guardada */}
           <SelectableBox
-            title="Información Guardada"
+            viewNote="Información Guardada"
             initialData={conflict.serverVersion}
             selected={selectedVersion === "server"}
             onSubmit={() => setSelectedVersion("server")}
             onClick={() => setSelectedVersion("server")}
-
           />
 
           {/* Cambios Recientes */}
           <SelectableBox
-            title="Cambios Recientes"
+            viewNote="Cambios Recientes"
             initialData={conflict.clientVersion}
             selected={selectedVersion === "client"}
             onSubmit={() => setSelectedVersion("client")}
@@ -121,20 +152,19 @@ const ResolveConflict = () => {
 
           {/* Mezclar Información */}
           <SelectableBox
-            title="Mezclar Información"
+            viewNote="Mezclar Información"
             initialData={mergedNote}
             mode="edit"
             autoSave={true}
             selected={selectedVersion === "merged"}
             onSubmit={(data) => {
               setSelectedVersion("merged");
-              console.log("Merged desde onsumit data", data);
+              console.log("Merged desde onSubmit data", data);
               setMergedNote(data);
             }}
-            onClick={(data) => {
-              console.log("Merged esde click data", data);
-              setSelectedVersion("merged")}
-            }
+            onClick={() => {
+              setSelectedVersion("merged");
+            }}
           />
         </Box>
 
