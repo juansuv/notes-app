@@ -10,8 +10,10 @@ import {
   FETCH_NOTES_FAILURE,
   UPDATE_NOTE_CONFLICT,
   CLEAR_CONFLICT,
+  UPDATE_NOTE_TAGS,
+  UPDATE_NOTE_COLOR,
 } from "./types";
-import { debug } from "console";
+
 
 export const createNoteSuccess = (note) => ({
   type: CREATE_NOTE_SUCCESS,
@@ -30,7 +32,6 @@ export const createNote = (note) => async (dispatch, getState) => {
         Authorization: `${token_type} ${token}`,
       },
     });
-    console.log("creonota" );
     dispatch(createNoteSuccess(response.data));
     
     return { success: true };
@@ -45,23 +46,20 @@ export const updateNote = (note) => async (dispatch, getState) => {
   const state = getState();
   const token = state.auth.token;
   const apiUrl = import.meta.env.VITE_APP_NOTE_API_URL;
-
-  console.log("note", note);
   try {
-    console.log("nota enviada a actualizar", note);
+
     const response = await axios.put(`${apiUrl}/api/notes/${note.id}`, note, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log("response", response.data);
     dispatch({
       type: UPDATE_NOTE_SUCCESS,
       payload: response.data,
     });
     return { success: true };
   } catch (error) {
-    if (error.response?.status === 409) {
+    if (axios.isAxiosError(error) && error.response?.status === 409) {
       // Si hay un conflicto, despacha la acción de conflicto
       dispatch({
         type: UPDATE_NOTE_CONFLICT,
@@ -139,7 +137,22 @@ export const fetchNotes = () => async (dispatch: any, getState: any) => {
       },
     });
     dispatch(fetchNotesSuccess(response.data));
-  } catch (error: any) {
-    dispatch(fetchNotesFailure(error.message || "Error al obtener las notas"));
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      dispatch(fetchNotesFailure(error.message || "Error al obtener las notas"));
+    } else {
+      dispatch(fetchNotesFailure("Error al obtener las notas"));
+    }
   }
 };
+
+export const updateNoteTags = (noteId: number, tags: string[]) => ({
+  type: UPDATE_NOTE_TAGS,
+  payload: { noteId, tags },
+});
+
+// Acción para actualizar color
+export const updateNoteColor = (noteId: number, color : string ) => ({
+  type: UPDATE_NOTE_COLOR,
+  payload: { noteId, color },
+});

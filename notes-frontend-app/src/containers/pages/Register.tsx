@@ -9,7 +9,7 @@ import {
   Grid,
   Alert,
 } from "@mui/material";
-import image from "../../assets/img/banner-login.webp"; // Cambia la ruta si es necesario
+import image from "../../assets/img/banner-login.jpeg"; // Cambia la ruta si es necesario
 import { Link, useNavigate } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import { registerUser } from "../../services/userService";
@@ -39,7 +39,7 @@ const Register = () => {
 
 
 
-    console.log("Register submitted");
+    ("Register submitted");
     if (result.success) {
       setMessage("Usuario creado exitosamente");
       setName("");
