@@ -22,7 +22,7 @@ function Footer() {
         bottom: 0,
         width: "100%", // Ocupa todo el ancho de la ventana.
         height: 180, // Altura fija para consistencia.
-        fontSize: { xs: "0.8rem", sm: "1rem" } // Tamaño de fuente dinámico según la pantalla.
+        fontSize: { xs: "0.8rem", sm: "1rem" }, // Tamaño de fuente dinámico según la pantalla.
       }}
     >
       <Grid container spacing={2} justifyContent="center">
@@ -61,8 +61,9 @@ function Footer() {
         {/* Derechos de autor */}
         <Grid item xs={12} sm={12}>
           <Typography variant="body2" sx={{ mt: 2 }}>
-            {/* Inserto automáticamente el año actual */}
-            © {new Date().getFullYear()} NotaFy Tu Aplicación de Notas. Todos los derechos reservados.
+            {/* Inserto automáticamente el año actual */}©{" "}
+            {new Date().getFullYear()} NotaFy Tu Aplicación de Notas. Todos los
+            derechos reservados.
           </Typography>
         </Grid>
       </Grid>

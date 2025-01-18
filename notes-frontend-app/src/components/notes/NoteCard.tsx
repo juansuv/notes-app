@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Box,
   Typography,
@@ -195,7 +195,11 @@ const NoteCard = ({ note, onView, onDelete }) => {
           <Button onClick={handleCloseDialog} color="primary">
             Cancelar
           </Button>
-          <Button onClick={handleConfirmDelete} color="error" variant="contained">
+          <Button
+            onClick={handleConfirmDelete}
+            color="error"
+            variant="contained"
+          >
             Eliminar
           </Button>
         </DialogActions>

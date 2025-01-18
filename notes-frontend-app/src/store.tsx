@@ -6,15 +6,16 @@ import { loadState } from "./utils/loadState";
 
 
 
-const preloadedState = loadState(); // Carga el estado inicial
-
 const middleware = [thunk];
 
 const store = createStore(
   rootReducer,
-  preloadedState,
-  //applyMiddleware(...middleware)
+  loadState(),
   composeWithDevTools(applyMiddleware(...middleware))
 );
+
+export type RootState = ReturnType<typeof rootReducer>;
+export type AppDispatch = typeof store.dispatch;
+
 
 export default store;

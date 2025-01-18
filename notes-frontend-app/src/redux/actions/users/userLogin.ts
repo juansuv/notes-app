@@ -1,50 +1,57 @@
 import axios from "axios";
 import { LOGIN_USER_SUCCESS, LOGIN_USER_FAILURE } from "./types";
 import { startSessionTimer } from "../../../utils/sessionUtils";
+import { AppDispatch } from "../../../store";
 
+// Acción para iniciar sesión de usuario
 export const loginUser =
-  (username: string, password: string) => async (dispatch: any) => {
+  (username: string, password: string) => async (dispatch: AppDispatch) => {
+    // Configuración de los encabezados para la solicitud
     const config = {
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "application/json", // Indica que el contenido será JSON
       },
     };
 
-
     try {
+      // Obtiene la URL de la API desde las variables de entorno
       const apiUrl = import.meta.env.VITE_APP_NOTE_API_URL;
-      const body = { username: username, password: password };
+      const body = { username, password }; // Cuerpo de la solicitud con las credenciales del usuario
 
-      const res = await axios.post(
-        `${apiUrl}/api/auth/login`,
-        body,
-        config
-      );
+      // Realiza la solicitud POST para iniciar sesión
+      const res = await axios.post(`${apiUrl}/api/auth/login`, body, config);
 
-      // Si el login es exitoso, despacha la acción de éxito con el token
+      // Si el login es exitoso (status 200), procesa la respuesta
       if (res.status === 200) {
+        const { token, username, token_type, tokenExpiration } = res.data;
 
+        // Almacena el token y otros datos relevantes en el sessionStorage
+        sessionStorage.setItem("token", token);
+        sessionStorage.setItem("username", username);
+        sessionStorage.setItem("token_type", token_type);
 
-        sessionStorage.setItem("token", res.data.token);
-        sessionStorage.setItem("username", res.data.username);
-        sessionStorage.setItem("token_type", res.data.token_type);
-        
-        const expirationTime = new Date().getTime() + res.data.tokenExpiration * 1000 * 60;
+        // Calcula el tiempo de expiración del token
+        const expirationTime = new Date().getTime() + tokenExpiration * 60 * 1000; // Convertir minutos a milisegundos
         sessionStorage.setItem("tokenExpiration", expirationTime.toString());
+
+        // Inicia un temporizador para la sesión basado en el tiempo de expiración
         startSessionTimer(expirationTime);
 
+        // Despacha la acción de éxito con los datos del usuario
         dispatch({
           type: LOGIN_USER_SUCCESS,
-          payload: res.data, // Asegúrate de que tu API retorne el token en esta propiedad
+          payload: res.data, // Contiene toda la información retornada por la API
         });
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error en el login:", error);
 
       // Manejo del error y despacho de acción de fallo
       dispatch({
         type: LOGIN_USER_FAILURE,
-        payload: error.response?.data?.message || "Error al iniciar sesión. Usuario o Contraseña incorrectos",
+        payload: axios.isAxiosError(error)
+          ? error.response?.data?.message || "Error al iniciar sesión. Usuario o Contraseña incorrectos"
+          : "Error desconocido al iniciar sesión",
       });
     }
   };

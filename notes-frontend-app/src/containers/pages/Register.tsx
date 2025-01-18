@@ -10,7 +10,7 @@ import {
   Alert,
 } from "@mui/material";
 import image from "../../assets/img/banner-login.jpeg"; // Cambia la ruta si es necesario
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import { registerUser } from "../../services/userService";
 
@@ -24,27 +24,23 @@ const Register = () => {
   const [success, setSuccess] = useState(false);
 
   const navigate = useNavigate();
-
+  const location = useLocation();
 
   useEffect(() => {
-    if (success) {
-      navigate("/login");
+    // Muestra mensaje al redirigir desde el registro
+    if (location.state?.message) {
+      setMessage(location.state.message);
     }
-  }, [success, navigate]);
+  }, [location]);
    
   const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const result = await registerUser(name, password);
-
-
-
-
-    ("Register submitted");
     if (result.success) {
-      setMessage("Usuario creado exitosamente");
       setName("");
       setPassword("");
       setSuccess(true);
+      navigate("/login", { state: { message: "Usuario creado exitosamente" } });
     } else {
       setMessage(result.message);
       setSuccess(false);

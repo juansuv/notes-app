@@ -1,6 +1,12 @@
-import React from "react";
 import { useDispatch } from "react-redux";
-import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from "@mui/material";
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Button,
+} from "@mui/material";
 
 import { deleteNote } from "../../redux/actions/notes/notes";
 
@@ -17,7 +23,8 @@ const DeleteNote = ({ open, onClose, noteId }) => {
       <DialogTitle>Eliminar Nota</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          ¿Estás seguro de que deseas eliminar esta nota? Esta acción no se puede deshacer.
+          ¿Estás seguro de que deseas eliminar esta nota? Esta acción no se
+          puede deshacer.
         </DialogContentText>
       </DialogContent>
       <DialogActions>

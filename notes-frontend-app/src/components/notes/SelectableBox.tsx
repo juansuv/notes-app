@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import NoteForm from "./NoteForm"; // Importa tu NoteForm
 
 interface SelectableBoxProps {
@@ -14,7 +14,6 @@ interface SelectableBoxProps {
 }
 
 const SelectableBox: React.FC<SelectableBoxProps> = ({
-
   initialData,
   selected,
   onSubmit,

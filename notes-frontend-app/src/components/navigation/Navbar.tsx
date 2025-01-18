@@ -17,7 +17,6 @@ interface NavbarProps {
   logoutUser: () => void;
 }
 
-
 interface RootState {
   auth: {
     token: string | null;
@@ -86,7 +85,6 @@ function Navbar({ isAuthenticated, username, logoutUser }: NavbarProps) {
     </AppBar>
   );
 }
-
 
 const mapStateToProps = (state: RootState) => ({
   isAuthenticated: !!state.auth.token, // Verifica si el usuario está autenticado

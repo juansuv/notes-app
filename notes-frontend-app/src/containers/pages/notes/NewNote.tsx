@@ -4,13 +4,13 @@ import Navbar from "../../../components/navigation/Navbar";
 import NoteForm from "../../../components/notes/NoteForm";
 import { createNote } from "../../../redux/actions/notes/notes";
 import { useNavigate } from "react-router-dom";
-import { error } from "console";
+import { NoteInterface } from "utils/types";
 
 const CreateNote = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const handleCreate = async (note) => {
+  const handleCreate = async (note: NoteInterface) => {
     const result = await dispatch(createNote(note)); // Despacha la acción para crear la nota
         // Manejar el resultado de la actualización
     if (result.success) {
