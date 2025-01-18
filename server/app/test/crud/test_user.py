@@ -7,10 +7,9 @@ from uuid import uuid4
 
 @pytest.mark.asyncio
 async def test_create_user_crud(async_session: AsyncSession):
-    id=uuid4().hex
-    user = UserCreate(username=f"newuser_{id}", password="newpassword")
+    id = uuid4().hex
+    user = UserCreate(username=f"Newuser{id}", password="Newpassword123")
     print("creating user")
     created_user = await create_user(async_session, user)
-    assert created_user.username == f"newuser_{id}"
-    assert created_user.password != "newpassword"  # Password debe estar hasheado
-
+    assert created_user.username == f"Newuser{id}"
+    assert created_user.password != "Newpassword123"  # Password debe estar hasheado
