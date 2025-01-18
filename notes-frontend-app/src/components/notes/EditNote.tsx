@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, useNavigate } from "react-router-dom";
 import { Box, Typography, TextField, Button, Paper } from "@mui/material";
@@ -6,13 +6,14 @@ import { Box, Typography, TextField, Button, Paper } from "@mui/material";
 import Layout from "../../hocs/layouts/Layout";
 import Navbar from "../navigation/Navbar";
 import { fetchNotes, updateNote } from "../../redux/actions/notes/notes";
+import { RootState } from "store";
 
 const EditNote = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { notes } = useSelector((state) => state.notes);
+  const { notes } = useSelector((state: RootState) => state.notes);
   const note = notes.find((n) => n.id === parseInt(id));
 
   const [title, setTitle] = useState("");
@@ -29,7 +30,7 @@ const EditNote = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    dispatch(updateNote({ id:id, title:title, content:content })); // Actualiza la nota
+    dispatch(updateNote({ id: id, title: title, content: content })); // Actualiza la nota
     navigate("/notes"); // Redirige a la lista de notas
   };
 
@@ -84,11 +85,7 @@ const EditNote = () => {
               onChange={(e) => setContent(e.target.value)}
               required
             />
-            <Button
-              type="submit"
-              variant="contained"
-              sx={{ marginTop: 2 }}
-            >
+            <Button type="submit" variant="contained" sx={{ marginTop: 2 }}>
               Guardar Cambios
             </Button>
           </Box>

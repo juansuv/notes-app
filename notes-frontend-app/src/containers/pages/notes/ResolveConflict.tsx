@@ -58,7 +58,7 @@ const ResolveConflict = () => {
     }
   }, [conflict]);
 
-  const handleResolve = () => {
+  const handleResolve = async () => {
     const noteToSave =
       selectedVersion === "server"
         ? { ...conflict.serverVersion, version: conflict.serverVersion.version }
@@ -73,11 +73,26 @@ const ResolveConflict = () => {
             ...mergedNote,
             id: conflict.serverVersion.id,
           };
-    dispatch(updateNote(noteToSave));
-    dispatch(clearConflict());
-    setConflict(null);
-    navigate(`/notes`);
-  };
+    const result = await dispatch(updateNote(noteToSave));
+    if (result.success) {
+      dispatch(clearConflict());
+      setConflict(null);
+      navigate(`/notes`);
+    }
+     else if (result.error) {
+      const errors = Array.isArray(result.error) ? result.error : [result.error];
+      errors.map((err) => {
+        console.log(err.error);
+        alert(err.error.replace(/^Value error, /, ""));
+      });
+
+    } else {
+      alert("Error al crear la nota.");
+    }
+    return result // Redirige a la lista de notas
+    };
+    
+
 
   if (!conflict) {
     return <div>No hay conflictos para esta nota.</div>;

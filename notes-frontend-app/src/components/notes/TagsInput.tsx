@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { TextField, Chip, Box } from "@mui/material";
-import { useDispatch } from "react-redux";
 
 interface TagsInputProps {
   currentTags: string[];
