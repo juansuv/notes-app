@@ -13,6 +13,10 @@ router = APIRouter()
 async def list_all_notes(
     db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user)
 ):
+    """
+    Obtiene todas las notas en la base de datos.
+    - Solo se utiliza para propósitos administrativos.
+    """
     return await get_all_notes(db)
 
 
@@ -28,6 +32,13 @@ async def create_new_note(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    """
+    Crea una nueva nota para el usuario autenticado.
+    Parámetros:
+    - `note`: Datos necesarios para crear la nota (título, contenido, etc.).
+    - `db`: Sesión asíncrona de base de datos.
+    - `current_user`: Usuario autenticado que será el propietario de la nota.
+    """
     return await create_note(db, note, current_user.id)
 
 
@@ -41,6 +52,12 @@ async def create_new_note(
 async def list_user_notes(
     db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user)
 ):
+    """
+    Obtiene todas las notas creadas por el usuario autenticado.
+    Parámetros:
+    - `db`: Sesión asíncrona de base de datos.
+    - `current_user`: Usuario autenticado.
+    """
     return await get_user_notes(db, current_user.id)
 
 
@@ -56,6 +73,13 @@ async def get_note(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    """
+    Obtiene una nota específica por su ID.
+    Parámetros:
+    - `note_id`: ID de la nota a buscar.
+    - `db`: Sesión asíncrona de base de datos.
+    - `current_user`: Usuario autenticado.
+    """
     note = await get_note_by_id(db, note_id, current_user.id)
     if not note:
         raise HTTPException(status_code=404, detail="Note not found")
@@ -75,21 +99,20 @@ async def edit_note(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    result = await update_note(db, note_id, current_user.id, updated_note,  version=updated_note.version)
-     # Maneja errores basados en la respuesta
+    """
+    Actualiza una nota existente.
+    Parámetros:
+    - `note_id`: ID de la nota a actualizar.
+    - `updated_note`: Datos nuevos de la nota.
+    - `db`: Sesión asíncrona de base de datos.
+    - `current_user`: Usuario autenticado.
+    """
+    result = await update_note(db, note_id, current_user.id, updated_note, version=updated_note.version)
     if "error" in result:
         if result["error"] == "Note not found or unauthorized":
-            raise HTTPException(
-                status_code=404,
-                detail=result["error"]
-            )
+            raise HTTPException(status_code=404, detail=result["error"])
         elif result["error"] == "Conflict detected. The note was modified by another user.":
-            raise HTTPException(
-                status_code=409,
-                detail=result
-            )
-
-    # Si no hay error, devuelve la nota actualizada
+            raise HTTPException(status_code=409, detail=result)
     return result["note"]
 
 
@@ -105,30 +128,36 @@ async def delete_user_note(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    """
+    Elimina una nota específica.
+    Parámetros:
+    - `note_id`: ID de la nota a eliminar.
+    - `db`: Sesión asíncrona de base de datos.
+    - `current_user`: Usuario autenticado.
+    """
     success = await delete_note(db, note_id, current_user.id)
     if not success:
-        raise HTTPException(
-            status_code=404, detail="Note not found or not authorized to delete"
-        )
+        raise HTTPException(status_code=404, detail="Note not found or not authorized to delete")
 
 
 @router.post("/{note_id}/share")
-async def share_note(note_id: int, share_data: ShareNote, user_id: int, db: AsyncSession = Depends(get_db)):
+async def share_note(note_id: int, share_data: ShareNote, db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user)):
     """
-    Agrega usuarios al campo `shared_with` de una nota.
-    Solo el propietario puede compartir la nota.
+    Comparte una nota con otros usuarios.
+    Solo el propietario de la nota puede compartirla.
+    Parámetros:
+    - `note_id`: ID de la nota a compartir.
+    - `share_data`: Lista de IDs de los usuarios con los que se compartirá la nota.
+    - `db`: Sesión asíncrona de base de datos.
+    - `current_user`: Usuario autenticado.
     """
-    # Obtener la nota por ID y validar que el usuario sea el propietario
-    result = await db.execute(select(Note).where(Note.id == note_id, Note.owner_id == user_id))
-    note = result.scalar_one_or_none()
+    note = await get_note_by_id(db, note_id, current_user.id)
     if not note:
         raise HTTPException(status_code=404, detail="Note not found or unauthorized")
 
-    # Agregar los nuevos usuarios al campo shared_with
+    # Agregar usuarios al campo `shared_with` y evitar duplicados
     note.shared_with.extend(share_data.shared_with)
-    note.shared_with = list(set(note.shared_with))  # Evitar duplicados
-
-    # Guardar cambios en la base de datos
+    note.shared_with = list(set(note.shared_with))
     await db.commit()
     await db.refresh(note)
 
