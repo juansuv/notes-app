@@ -1,4 +1,3 @@
-import React from "react";
 import { connect } from "react-redux";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
@@ -12,7 +11,21 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import { Link } from "react-router-dom";
 import { logoutUser } from "../../redux/actions/users/userLogout"; // Acción de logout
 
-function Navbar({ isAuthenticated, username, logoutUser }) {
+interface NavbarProps {
+  isAuthenticated: boolean;
+  username: string;
+  logoutUser: () => void;
+}
+
+
+interface RootState {
+  auth: {
+    token: string | null;
+    username: string;
+  };
+}
+
+function Navbar({ isAuthenticated, username, logoutUser }: NavbarProps) {
   return (
     <AppBar position="fixed">
       <Toolbar
@@ -74,7 +87,8 @@ function Navbar({ isAuthenticated, username, logoutUser }) {
   );
 }
 
-const mapStateToProps = (state) => ({
+
+const mapStateToProps = (state: RootState) => ({
   isAuthenticated: !!state.auth.token, // Verifica si el usuario está autenticado
   username: state.auth.username, // Recupera el nombre de usuario
 });

@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.crud.note import *
 from app.schemas.note import NoteCreate, NoteResponse, NoteUpdate
 from app.schemas.shared_note import ShareNote
-from app.dependencies import get_db, get_current_user
+from app.utils.dependencies import get_db, get_current_user
 from app.models.user import User
 
 router = APIRouter()

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import Layout from "../../../hocs/layouts/Layout";
+import Layout from "hocs/layouts/Layout";
 import Navbar from "../../../components/navigation/Navbar";
 import NoteForm from "../../../components/notes/NoteForm"; // Reutilizamos NoteForm
 import { fetchNotes, updateNote } from "../../../redux/actions/notes/notes";

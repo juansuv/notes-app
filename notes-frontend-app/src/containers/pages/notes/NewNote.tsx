@@ -1,5 +1,5 @@
 import { useDispatch } from "react-redux";
-import Layout from "../../../hocs/layouts/Layout";
+import Layout from "hocs/layouts/Layout";
 import Navbar from "../../../components/navigation/Navbar";
 import NoteForm from "../../../components/notes/NoteForm";
 import { createNote } from "../../../redux/actions/notes/notes";

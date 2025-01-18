@@ -2,9 +2,10 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Box, Typography, Grid, Button } from "@mui/material";
+import NoteAddOutlinedIcon from "@mui/icons-material/NoteAddOutlined";
 
-import Layout from "../../../hocs/layouts/Layout";
-import Navbar from "../../../components/navigation/Navbar";
+import Layout from "hocs/layouts/Layout";
+import Navbar from "../../../components/navigation/Navbar.tsx";
 import NoteCard from "../../../components/notes/NoteCard.tsx";
 import { fetchNotes, deleteNote } from "../../../redux/actions/notes/notes";
 
@@ -83,6 +84,7 @@ const Notes = () => {
             }}
           >
             Crear Nueva Nota
+            
           </Button>
         </Box>
 
@@ -150,7 +152,22 @@ const Notes = () => {
         </Grid>
 
         {!loading && !error && notes.length === 0 && (
-          <Typography>No tienes notas creadas.</Typography>
+          <Box
+            display="flex"
+            flexDirection="column"
+            alignItems="center"
+            justifyContent="center"
+            height="100%"
+            textAlign="center"
+          >
+            <NoteAddOutlinedIcon onClick={handleCreateNewNote} fontSize="large" color="disabled" />
+            <Typography variant="h6" color="textSecondary">
+              No tienes notas creadas.
+            </Typography>
+            <Typography variant="body2" color="textSecondary">
+              Crea tu primera nota para comenzar a organizar tus ideas.
+            </Typography>
+          </Box>
         )}
       </Box>
     </Layout>

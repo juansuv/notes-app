@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import Layout from "../../hocs/layouts/Layout"; // Ajusta según la ubicación exacta
+import Layout from "hocs/layouts/Layout"; // Ajusta según la ubicación exacta
 import Navbar from "../../components/navigation/Navbar";
 import { Box, Button, TextField, Typography, Paper, Grid } from "@mui/material";
 import image from "../../assets/img/banner-login.jpeg"; // Cambia la ruta si es necesario

@@ -24,7 +24,15 @@
 
     "baseUrl": "./src",
     "paths": {
-      "hocs/*": ["hocs/*"]
+      "hocs/*": ["hocs/*"],
+      "components/*": ["components/*"],
+      "containers/*": ["containers/*"],
+      "redux/*": ["redux/*"],
+      "services/*": ["services/*"],
+      "utils/*": ["utils/*"],
+      "assets/*": ["assets/*"],
+
+      
     },
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true

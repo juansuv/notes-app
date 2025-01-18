@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { clearConflict, updateNote } from "../../../redux/actions/notes/notes";
 import { Box, Typography, Button, colors } from "@mui/material";
 import SelectableBox from "../../../components/notes/SelectableBox"; // Importa tu nuevo componente
-import Layout from "../../../hocs/layouts/Layout";
+import Layout from "hocs/layouts/Layout";
 import Navbar from "../../../components/navigation/Navbar";
 import { useNavigate, useParams } from "react-router-dom";
 
