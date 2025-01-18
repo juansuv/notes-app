@@ -1,9 +1,10 @@
 import axios from "axios";
 import { LOGIN_USER_SUCCESS, LOGIN_USER_FAILURE } from "./types";
 import { startSessionTimer } from "../../../utils/sessionUtils";
+import { AppDispatch } from "../../../store";
 
 export const loginUser =
-  (username: string, password: string) => async (dispatch: any) => {
+  (username: string, password: string) => async (dispatch: AppDispatch) => {
     const config = {
       headers: {
         "Content-Type": "application/json",
@@ -38,13 +39,13 @@ export const loginUser =
           payload: res.data, // Asegúrate de que tu API retorne el token en esta propiedad
         });
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error en el login:", error);
 
       // Manejo del error y despacho de acción de fallo
       dispatch({
         type: LOGIN_USER_FAILURE,
-        payload: error.response?.data?.message || "Error al iniciar sesión. Usuario o Contraseña incorrectos",
+        payload: axios.isAxiosError(error) && error.response?.data?.message || "Error al iniciar sesión. Usuario o Contraseña incorrectos",
       });
     }
   };

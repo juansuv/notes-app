@@ -1,4 +1,7 @@
 // reducers/notesReducer.ts
+import { NoteInterface } from "../../../utils/types";
+import { NotesAction } from "../../actions/notes/types";
+
 import {
   FETCH_NOTES_REQUEST,
   FETCH_NOTES_SUCCESS,
@@ -14,19 +17,20 @@ import {
 
 interface NotesState {
   loading: boolean;
-  notes: any[];
+  notes: NoteInterface[];
   error: string | null;
-  conflict: null; // Almacena las versiones en conflicto
+  conflict: { serverVersion: NoteInterface; clientVersion: NoteInterface } | null; // Almacena las versiones en conflicto
 }
 
 const initialState: NotesState = {
   loading: false,
   notes: [],
   error: null,
-  conflict: JSON.parse(localStorage.getItem("conflict")) || {}, // Almacena las versiones en conflicto
+  conflict: JSON.parse(localStorage.getItem("conflict") || '{}'), // Almacena las versiones en conflicto
 };
 
-const notesReducer = (state = initialState, action: any): NotesState => {
+
+const notesReducer = (state = initialState, action: NotesAction): NotesState => {
   switch (action.type) {
     case FETCH_NOTES_REQUEST:
       return {
@@ -36,7 +40,6 @@ const notesReducer = (state = initialState, action: any): NotesState => {
       };
 
     case FETCH_NOTES_SUCCESS:
-      ("obtiene nota de la bd con ", action.payload);
       return {
         ...state,
         loading: false,

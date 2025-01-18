@@ -1,6 +1,7 @@
 // actions/notes/notes.ts
 import axios from "axios";
-
+import { NoteInterface } from "../../../utils/types";
+import { AppDispatch, RootState } from "../../../store";
 import {
   CREATE_NOTE_SUCCESS,
   UPDATE_NOTE_SUCCESS,
@@ -12,14 +13,15 @@ import {
   CLEAR_CONFLICT,
   UPDATE_NOTE_TAGS,
   UPDATE_NOTE_COLOR,
+  NotesAction,
 } from "./types";
 
-export const createNoteSuccess = (note) => ({
+export const createNoteSuccess = (note: NoteInterface): NotesAction => ({
   type: CREATE_NOTE_SUCCESS,
   payload: note,
 });
 
-export const createNote = (note) => async (dispatch, getState) => {
+export const createNote = (note: NoteInterface) => async (dispatch: AppDispatch, getState: () => RootState) => {
   const state = getState();
   const token = state.auth.token;
   const token_type = state.auth.token_type;
@@ -45,7 +47,7 @@ export const createNote = (note) => async (dispatch, getState) => {
 };
 
 // actions/notes/notes.ts
-export const updateNote = (note) => async (dispatch, getState) => {
+export const updateNote = (note: NoteInterface) => async (dispatch: AppDispatch, getState: () => RootState) => {
   const state = getState();
   const token = state.auth.token;
   const apiUrl = import.meta.env.VITE_APP_NOTE_API_URL;
@@ -88,7 +90,7 @@ export const clearConflict = () => ({
   type: CLEAR_CONFLICT,
 });
 
-export const deleteNote = (id) => async (dispatch, getState) => {
+export const deleteNote = (id: number) => async (dispatch: AppDispatch, getState: () => RootState) => {
   const state = getState();
   const token = state.auth.token;
   const apiUrl = import.meta.env.VITE_APP_NOTE_API_URL;
@@ -110,24 +112,25 @@ export const deleteNote = (id) => async (dispatch, getState) => {
 };
 
 // Acción para iniciar la solicitud
-export const fetchNotesRequest = () => ({
+export const fetchNotesRequest = (): NotesAction => ({
   type: FETCH_NOTES_REQUEST,
+  payload: "",
 });
 
 // Acción para manejar el éxito de la solicitud
-export const fetchNotesSuccess = (notes: any[]) => ({
+export const fetchNotesSuccess = (notes: NoteInterface[]): NotesAction => ({
   type: FETCH_NOTES_SUCCESS,
   payload: notes,
 });
 
 // Acción para manejar errores en la solicitud
-export const fetchNotesFailure = (error: string) => ({
+export const fetchNotesFailure = (error: string): NotesAction => ({
   type: FETCH_NOTES_FAILURE,
   payload: error,
 });
 
 // Acción asíncrona para obtener las notas desde el backend
-export const fetchNotes = () => async (dispatch: any, getState: any) => {
+export const fetchNotes = () => async (dispatch: AppDispatch, getState: () => RootState) => {
   const state = getState();
   const token = state.auth.token;
   const token_type = state.auth.token_type;
