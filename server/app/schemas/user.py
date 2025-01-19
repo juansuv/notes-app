@@ -15,6 +15,7 @@ class UserBase(BaseModel):
     # Validación personalizada para el nombre de usuario
     @field_validator("username")
     def validate_username(cls, value):
+        value = value.strip().lower()  # Convertir a minúsculas y eliminar espacios al inicio y final
         if len(value.strip()) < 3:
             raise ValueError("nombre de usuario: Debe tener al menos 3 caracteres.")
         if len(value.strip()) > 50:

@@ -9,7 +9,6 @@ async def test_register_user_endpoint(client: AsyncClient):
     response = await client.post(
         "api/auth/register", json={"username": "newuser2", "password": "NewPassword123"}
     )
-    print("response", response)
     assert response.status_code == 200
     assert response.json()["username"] == "newuser2"
 
@@ -51,8 +50,6 @@ async def test_register_duplicate_user(client: AsyncClient):
         "api/auth/register",
         json={"username": "duplicateuser", "password": "NewPassword123123"},
     )
-    print("liam", response2.json())
-    print("duarte", response1.json())
     assert response2.status_code == 409
     assert response2.json()["detail"] == "Username already registered"
 
@@ -82,7 +79,7 @@ async def test_access_protected_resource_with_invalid_token(client: AsyncClient)
         "/api/notes", headers={"Authorization": f"Bearer {invalid_token}"}
     )
     assert response.status_code == 401
-    assert response.json()["detail"] == "Invalid token"
+    assert response.json()["detail"] == "Not authenticated"
 
 
 @pytest.mark.asyncio

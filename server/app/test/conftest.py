@@ -44,7 +44,6 @@ async def client():
     Proporciona un cliente HTTP asíncrono para interactuar con la aplicación FastAPI.
     Este cliente se usa para realizar solicitudes HTTP simuladas en los tests.
     """
-    print("app", app)
     async with AsyncClient(app=app, base_url="http://test") as client:
         yield client
 
@@ -58,7 +57,6 @@ async def userFactory(async_session: AsyncSession):
     from app.crud.user import create_user
     from app.schemas.user import UserCreate
 
-    print("Creating user")
     user = UserCreate(username=f"Testuser{uuid4().hex}", password="Testpassword123.")
     created_user = await create_user(async_session, user)
     return created_user
@@ -83,7 +81,7 @@ async def tokenFactory(userFactory):
     from app.utils.authentication import create_access_token
 
     user = userFactory
-    access_token = create_access_token(data={"sub": user.username})
+    access_token = create_access_token(data={"sub": user.username, "user_id": user.id})
     return {"user": user, "token": access_token}
 
 
@@ -96,7 +94,6 @@ async def otherUserFactory(async_session: AsyncSession):
     from app.crud.user import create_user
     from app.schemas.user import UserCreate
 
-    print("Creating other user")
     user = UserCreate(username=f"other{uuid4().hex}", password="Testpassword123.")
     created_user = await create_user(async_session, user)
     return created_user
@@ -111,7 +108,7 @@ async def otherTokenFactory(otherUserFactory):
     from app.utils.authentication import create_access_token
 
     user = otherUserFactory
-    access_token = create_access_token(data={"sub": user.username})
+    access_token = create_access_token(data={"sub": user.username,  "user_id": user.id})
     return {"user": user, "token": access_token}
 
 
@@ -147,3 +144,40 @@ async def setup_notes_data(async_session: AsyncSession):
 
     # Retornar el usuario y las notas creadas
     return {"user": created_user, "notes": notes}
+
+
+@pytest.fixture
+async def isolated_client():
+    async with AsyncClient(app=app, base_url="http://testserver") as client:
+        yield client
+
+@pytest.fixture
+async def cookieFactory(client: AsyncClient, userFactory):
+    """
+    Realiza el login para un usuario creado por `userFactory` y retorna las cookies.
+    """
+    login_payload = {"username": userFactory.username, "password": "Testpassword123."}
+    response = await client.post("/api/auth/login_cookie", json=login_payload)
+    assert response.status_code == 200
+    cookies = response.cookies
+    return {"user": userFactory, "cookies": cookies}
+
+
+@pytest.fixture
+async def otherCookieFactory(isolated_client: AsyncClient, otherUserFactory):
+    """
+    Realiza el login para otro usuario creado por `otherUserFactory` y retorna las cookies.
+    """
+    
+    login_payload = {"username": otherUserFactory.username, "password": "Testpassword123."}
+    response = await isolated_client.post("/api/auth/login_cookie", json=login_payload)
+    assert response.status_code == 200
+    cookies = response.cookies
+    return {"user": otherUserFactory, "cookies": cookies}
+
+
+@pytest.fixture
+async def clean_client(client: AsyncClient):
+    client.cookies.clear()  # Limpia las cookies del cliente antes de usarlo
+    yield client
+    

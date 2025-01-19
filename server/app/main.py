@@ -23,6 +23,7 @@ app.add_middleware(
     allow_headers=["*"],  # Permitir todos los encabezados
 )
 
+
 app.include_router(user.router, prefix="/api/auth", tags=["Users"])
 app.include_router(note.router, prefix="/api/notes", tags=["Notes"])
 app.include_router(note_websocket.router, tags=["WebSockets"])
@@ -39,7 +40,6 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         loc = " -> ".join(str(e) for e in error["loc"])  # Ubicación del campo
         msg = error["msg"]  # Mensaje de error
         errors.append({"field": loc, "error": msg})
-    print(errors)
     return JSONResponse(
         status_code=422,
         content={"detail": "Validation error", "errors": errors},

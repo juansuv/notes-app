@@ -1,9 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request, Response    
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.crud.user import create_user, get_user_by_username
 from app.schemas.user import UserCreate, UserResponse, UserLogin
-from app.utils.authentication import create_access_token, verify_password
+from app.utils.authentication import create_access_token, create_refresh_token, decode_refresh_token, verify_password
 from app.config.db import get_db
+import jwt
+from jwt import PyJWTError as JWTError
 import os
 from dotenv import load_dotenv
 
@@ -84,7 +86,7 @@ async def login_user(userLogin: UserLogin, db: AsyncSession = Depends(get_db)):
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
     # Genera un token de acceso JWT
-    token = create_access_token(data={"sub": db_user.username})
+    token = create_access_token(data={"sub": db_user.username, "user_id": db_user.id})
 
     # Retorna el token y la información del usuario autenticado
     return {
@@ -93,3 +95,62 @@ async def login_user(userLogin: UserLogin, db: AsyncSession = Depends(get_db)):
         "username": db_user.username,
         "tokenExpiration": os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"),
     }
+
+
+
+
+from fastapi.responses import JSONResponse
+
+@router.post("/login_cookie")
+async def login_cookie(userLogin: UserLogin, db: AsyncSession = Depends(get_db)):
+    # Autenticar usuario
+    db_user = await get_user_by_username(db, userLogin.username)
+    if not db_user or not verify_password(userLogin.password, db_user.password):
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+
+    # Generar token JWT
+    token = create_access_token(data={"sub": db_user.username, "user_id": db_user.id})
+    refresh_token = create_refresh_token({"sub": db_user.username, "user_id": db_user.id})
+    # Crear respuesta con token en cookie segura
+    response = JSONResponse(content={"message": "Login successful", "username": db_user.username, "token": f"Bearer {token}"})
+    response.set_cookie(
+        key="access_token",
+        value=f"Bearer {token}",
+        httponly=True,
+        secure=False,
+        samesite="Strict",
+    )
+    #agregamos token de refresco
+    response.set_cookie(key="refresh_token", value=refresh_token, httponly=True)
+    return response
+
+
+@router.post("/logout_cookie")
+async def logout_cookie():
+    response = JSONResponse(content={"message": "Logout successful"})
+    response.delete_cookie(key="access_token")
+    return response
+
+
+
+from app.utils.dependencies import  get_current_active_user
+
+@router.post("/refresh")
+def refresh_token(request: Request, response: Response):
+    refresh_token = request.cookies.get("refresh_token")
+    if not refresh_token:
+        raise HTTPException(status_code=401, detail="Refresh token missing")
+
+    username= decode_refresh_token(refresh_token)
+    # Crear un nuevo token de acceso
+    new_access_token = create_access_token({"sub": username})
+    response.set_cookie(
+        key="access_token",
+        value=f"Bearer {new_access_token}",
+        httponly=True,
+        secure=True,  # Usar solo en HTTPS
+        samesite="Strict",  # Prevenir ataques CSRF
+    )
+    return {"access_token": new_access_token}
+    
+    
