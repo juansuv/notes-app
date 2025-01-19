@@ -1,0 +1,111 @@
+#!/bin/bash
+
+set -e
+
+# Colores para el log
+GREEN="\033[0;32m"
+RED="\033[0;31m"
+YELLOW="\033[0;33m"
+RESET="\033[0m"
+
+# Carga las variables de entorno para las bases de datos de producción y test
+source ./server/app/.env
+source ./server/app/.env.test
+
+# Función para mostrar mensajes de éxito y error
+log_success() {
+  echo -e "${GREEN}[✔] $1${RESET}"
+}
+
+log_error() {
+  echo -e "${RED}[✘] $1${RESET}"
+}
+
+log_warning() {
+  echo -e "${YELLOW}[ℹ] $1${RESET}"
+}
+
+# Verifica que PostgreSQL esté instalado
+check_postgresql_installed() {
+  if ! command -v psql > /dev/null; then
+    log_error "PostgreSQL no está instalado. Por favor instálalo e intenta de nuevo."
+    exit 1
+  fi
+}
+
+# Verifica que el servicio de PostgreSQL esté corriendo
+start_postgresql_service() {
+  if [[ "$OSTYPE" == "darwin"* ]]; then
+    brew services start postgresql
+  else
+    sudo service postgresql start
+  fi
+  log_success "Servicio de PostgreSQL iniciado."
+}
+
+# Ejecuta comandos bajo el usuario postgres
+run_as_postgres() {
+  sudo -u postgres bash -c "$1" || {
+    log_error "Error ejecutando: $1"
+    exit 1
+  }
+}
+
+# Configura el usuario de la base de datos
+create_user() {
+  log_warning "🔑 Recomendación: Usa 'Notes123' como contraseña para la base de datos para evitar problemas."
+  log_warning "ℹ Se pedirá la contraseña de tu usuario del sistema operativo (con permisos sudo) para ejecutar comandos administrativos."
+
+  echo "Creando el usuario '$DB_USER' si no existe..."
+  run_as_postgres "psql -c \"DO \$\$ BEGIN IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = '$DB_USER') THEN CREATE ROLE $DB_USER LOGIN PASSWORD '$DB_PASS'; END IF; END \$\$;\""
+  log_success "Usuario configurado exitosamente."
+}
+
+# Elimina una base de datos
+drop_database() {
+  local db_name=$1
+  echo "Eliminando la base de datos '$db_name' si existe..."
+  run_as_postgres "psql -c \"DROP DATABASE IF EXISTS $db_name;\""
+  log_success "Base de datos '$db_name' eliminada exitosamente."
+}
+
+# Crea una nueva base de datos
+create_database() {
+  local db_name=$1
+  echo "Creando la base de datos '$db_name'..."
+  run_as_postgres "psql -c \"CREATE DATABASE $db_name OWNER $DB_USER;\""
+  log_success "Base de datos '$db_name' creada exitosamente."
+}
+
+# Configura las extensiones necesarias en una base de datos
+configure_extensions() {
+  local db_name=$1
+  echo "Agregando extensiones requeridas en la base de datos '$db_name'..."
+  run_as_postgres "psql -d $db_name -c \"CREATE EXTENSION IF NOT EXISTS pgcrypto;\""
+  log_success "Extensiones configuradas exitosamente en '$db_name'."
+}
+
+# Ejecuta las funciones principales
+setup_database() {
+  local db_name=$1
+  drop_database $db_name
+  create_database $db_name
+  configure_extensions $db_name
+}
+
+main() {
+  check_postgresql_installed
+  start_postgresql_service
+
+  create_user
+
+  echo "Configurando base de datos principal ($DB_NAME)..."
+  setup_database $DB_NAME
+
+  echo "Configurando base de datos de pruebas ($DB_NAME_TEST)..."
+  setup_database $DB_NAME_TEST
+
+  log_success "¡Todas las bases de datos han sido configuradas exitosamente!"
+}
+
+main

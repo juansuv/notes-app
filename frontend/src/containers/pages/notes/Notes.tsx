@@ -7,7 +7,7 @@ import NoteAddOutlinedIcon from "@mui/icons-material/NoteAddOutlined";
 import Layout from "hocs/layouts/Layout";
 import Navbar from "../../../components/navigation/Navbar.tsx";
 import NoteCard from "../../../components/notes/NoteCard.tsx";
-import { fetchNotes, deleteNote } from "../../../redux/actions/notes/notes";
+import { fetchNotes, deleteNote } from "../../../redux/actions/notes/notes.ts";
 import { RootState } from "store.tsx";
 
 const Notes = () => {
