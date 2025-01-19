@@ -52,7 +52,6 @@ const NoteForm: React.FC<NoteFormProps> = ({
 
   useEffect(() => {
     if (mode !== "create") {
-      console.log("actualiza los datos el usseefect de la nota");
       setTitle(initialData.title);
       setContent(initialData.content);
       setVersion(initialData.version);
@@ -87,7 +86,6 @@ const NoteForm: React.FC<NoteFormProps> = ({
         color,
         [field]: value, // Sobrescribe el campo modificado
       };
-      console.log("AutoSave activado, enviando datos:", updatedData);
       onSubmit(updatedData);
     }
   };

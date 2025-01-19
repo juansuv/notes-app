@@ -21,7 +21,6 @@ const CreateNote = () => {
      else if (result.error) {
       const errors = Array.isArray(result.error) ? result.error : [result.error];
       errors.map((err) => {
-        console.log(err.error);
         alert(err.error.replace(/^Value error, /, ""));
       });
 

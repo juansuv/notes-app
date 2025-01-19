@@ -72,7 +72,7 @@ export const loginUserCookies =
       });
         localStorage.setItem("access_token", res.data.token);
         localStorage.setItem("username", res.data.username);
-
+        
       dispatch({
         type: LOGIN_USER_SUCCESS,
         payload: res.data,

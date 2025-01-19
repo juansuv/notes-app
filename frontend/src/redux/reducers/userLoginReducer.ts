@@ -22,7 +22,6 @@ const initialState: AuthState = {
 const authReducer = (state = initialState, action: UserAction): AuthState => {
   switch (action.type) {
     case LOGIN_USER_SUCCESS:
-      console.log("login user success",action.payload);
       return {
         ...state,
         token: null, // Guarda el token en el estado
@@ -34,7 +33,6 @@ const authReducer = (state = initialState, action: UserAction): AuthState => {
       };
 
     case LOGIN_USER_FAILURE:
-      console.log("login failurjuane",action.payload);
       return {
         ...state,
         token: null, // limpiar el token en caso de error

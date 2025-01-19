@@ -28,7 +28,6 @@ const Login = () => {
   };
 
   if (success) {
-    console.log("login redirection")
     navigate("/notes");
   }
 

@@ -59,7 +59,6 @@ const NoteDetails = () => {
         ? result.error
         : [result.error];
       errors.map((err) => {
-        console.log(err.error);
         alert(err.error.replace(/^Value error, /, ""));
       });
     } else {

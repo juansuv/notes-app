@@ -40,6 +40,5 @@ export const getInvertedColor = (hexColor: string): string => {
   const luminosity = 0.299 * r + 0.587 * g + 0.114 * b;
 
   // Devuelve blanco para colores oscuros y negro para colores claros
-  console.log('color es', luminosity, hexColor);
   return luminosity > 128 ? "#000000" : "#ffffff";
 };

@@ -82,7 +82,6 @@ const ResolveConflict = () => {
      else if (result.error) {
       const errors = Array.isArray(result.error) ? result.error : [result.error];
       errors.map((err) => {
-        console.log(err.error);
         alert(err.error.replace(/^Value error, /, ""));
       });
 
@@ -174,7 +173,6 @@ const ResolveConflict = () => {
             selected={selectedVersion === "merged"}
             onSubmit={(data) => {
               setSelectedVersion("merged");
-              console.log("Merged desde onSubmit data", data);
               setMergedNote(data);
             }}
             onClick={() => {
