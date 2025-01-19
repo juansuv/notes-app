@@ -19,7 +19,7 @@ interface NavbarProps {
 
 interface RootState {
   auth: {
-    token: string | null;
+    success: boolean;
     username: string;
   };
 }
@@ -87,7 +87,7 @@ function Navbar({ isAuthenticated, username, logoutUser }: NavbarProps) {
 }
 
 const mapStateToProps = (state: RootState) => ({
-  isAuthenticated: !!state.auth.token, // Verifica si el usuario está autenticado
+  isAuthenticated: state.auth.success, // Verifica si el usuario está autenticado
   username: state.auth.username, // Recupera el nombre de usuario
 });
 

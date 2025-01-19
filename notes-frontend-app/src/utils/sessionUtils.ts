@@ -9,6 +9,21 @@ export const logout = () => {
   }
 };
 
+
+import axios from "axios";
+
+export const logout_cookies = async () => {
+  const apiUrl = import.meta.env.VITE_APP_NOTE_API_URL;
+
+  try {
+    await axios.post(`${apiUrl}/api/auth/logout_cookie`, {}, { withCredentials: true });
+    window.location.href = "/login";
+  } catch (error) {
+    console.error("Error al cerrar sesión:", error);
+  }
+};
+
+
 /**
  * Configura un temporizador que cerrará la sesión del usuario cuando el token expire.
  * @param expirationTime - Tiempo de expiración en milisegundos (timestamp).
@@ -30,12 +45,22 @@ export const startSessionTimer = (expirationTime: number) => {
  * Si el token es válido, configura un temporizador para cerrarla cuando expire.
  */
 export const checkSessionValidity = () => {
-  const tokenExpiration = sessionStorage.getItem("tokenExpiration"); // Recupero el tiempo de expiración del token almacenado en sessionStorage.
-  const expirationTime = tokenExpiration ? parseInt(tokenExpiration, 10) : 0; // Convierto el tiempo de expiración a un número.
-  if (!expirationTime || new Date().getTime() > expirationTime) {
-    logout(); // Si no hay token o ya expiró, cierro la sesión.
-  } else {
-    const timeRemaining = expirationTime - new Date().getTime(); // Calculo el tiempo restante.
-    startSessionTimer(timeRemaining); // Configuro el temporizador para cerrar la sesión cuando corresponda.
-  }
+  //const tokenExpiration = sessionStorage.getItem("tokenExpiration"); // Recupero el tiempo de expiración del token almacenado en sessionStorage.
+  //const expirationTime = tokenExpiration ? parseInt(tokenExpiration, 10) : 0; // Convierto el tiempo de expiración a un número.
+  //if (!expirationTime || new Date().getTime() > expirationTime) {
+  //  logout(); // Si no hay token o ya expiró, cierro la sesión.
+  //} else {
+  //  const timeRemaining = expirationTime - new Date().getTime(); // Calculo el tiempo restante.
+  //  startSessionTimer(timeRemaining); // Configuro el temporizador para cerrar la sesión cuando corresponda.
+  //}
+  console.log("validacion de session por cookies");
 };
+
+
+
+// Configuración base para Axios
+export const apiClient = axios.create({
+  baseURL: import.meta.env.VITE_APP_NOTE_API_URL, // URL base de la API
+  withCredentials: true, // Habilita envío de cookies automáticamente
+});
+

@@ -84,7 +84,7 @@ async def login_user(userLogin: UserLogin, db: AsyncSession = Depends(get_db)):
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
     # Genera un token de acceso JWT
-    token = create_access_token(data={"sub": db_user.username})
+    token = create_access_token(data={"sub": db_user.username, "user_id": db_user.id})
 
     # Retorna el token y la información del usuario autenticado
     return {
@@ -93,3 +93,36 @@ async def login_user(userLogin: UserLogin, db: AsyncSession = Depends(get_db)):
         "username": db_user.username,
         "tokenExpiration": os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"),
     }
+
+
+
+
+from fastapi.responses import JSONResponse
+
+@router.post("/login_cookie")
+async def login_cookie(userLogin: UserLogin, db: AsyncSession = Depends(get_db)):
+    # Autenticar usuario
+    db_user = await get_user_by_username(db, userLogin.username)
+    if not db_user or not verify_password(userLogin.password, db_user.password):
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+
+    # Generar token JWT
+    token = create_access_token(data={"sub": db_user.username, "user_id": db_user.id})
+
+    # Crear respuesta con token en cookie segura
+    response = JSONResponse(content={"message": "Login successful", "username": db_user.username })
+    response.set_cookie(
+        key="access_token",
+        value=f"Bearer {token}",
+        httponly=True,
+        secure=False,
+        samesite="Strict",
+    )
+    return response
+
+
+@router.post("/logout_cookie")
+async def logout_cookie():
+    response = JSONResponse(content={"message": "Logout successful"})
+    response.delete_cookie(key="access_token")
+    return response

@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.crud.note import *
 from app.schemas.note import NoteCreate, NoteResponse, NoteUpdate
 from app.schemas.shared_note import ShareNote
-from app.utils.dependencies import get_db, get_current_user
+from app.utils.dependencies import get_db, get_current_active_user
 from app.models.user import User
 
 router = APIRouter()
@@ -11,7 +11,7 @@ router = APIRouter()
 
 @router.get("/all_notes", response_model=list[NoteResponse])
 async def list_all_notes(
-    db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user)
+    db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_active_user)
 ):
     """
     Obtiene todas las notas en la base de datos.
@@ -30,7 +30,7 @@ async def list_all_notes(
 async def create_new_note(
     note: NoteCreate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_active_user),
 ):
     """
     Crea una nueva nota para el usuario autenticado.
@@ -50,7 +50,7 @@ async def create_new_note(
     response_description="Lista de todas las notas del usuario.",
 )
 async def list_user_notes(
-    db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user)
+    db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_active_user)
 ):
     """
     Obtiene todas las notas creadas por el usuario autenticado.
@@ -71,7 +71,7 @@ async def list_user_notes(
 async def get_note(
     note_id: int,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_active_user),
 ):
     """
     Obtiene una nota específica por su ID.
@@ -104,7 +104,7 @@ async def edit_note(
     note_id: int,
     updated_note: NoteUpdate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_active_user),
 ):
     """
     Actualiza una nota existente.
@@ -133,7 +133,7 @@ async def edit_note(
 async def delete_user_note(
     note_id: int,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_active_user),
 ):
     """
     Elimina una nota específica.
@@ -148,7 +148,7 @@ async def delete_user_note(
 
 
 @router.post("/{note_id}/share")
-async def share_note(note_id: int, share_data: ShareNote, db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user)):
+async def share_note(note_id: int, share_data: ShareNote, db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_active_user)):
     """
     Comparte una nota con otros usuarios.
     Solo el propietario de la nota puede compartirla.

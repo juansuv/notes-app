@@ -4,6 +4,7 @@ import jwt
 from passlib.context import CryptContext
 import os
 from dotenv import load_dotenv
+from uuid import uuid4
 
 # Cargar variables de entorno desde el archivo .env
 load_dotenv()
@@ -52,8 +53,10 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
     Retorna:
     - Un token JWT firmado como cadena de texto.
     """
-    # Copia los datos proporcionados para evitar modificaciones no deseadas
     to_encode = data.copy()
+
+    # Agregar un identificador único para garantizar unicidad
+    to_encode.update({"jti": str(uuid4())})
 
     # Calcula la fecha de expiración
     if expires_delta:
@@ -67,6 +70,7 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
     # Genera el token firmado
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
+
 
 def decode_access_token(token: str) -> Union[dict, None]:
     """

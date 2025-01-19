@@ -16,15 +16,15 @@ import { checkSessionValidity } from "./utils/sessionUtils";
 
 function App() {
 
-  useEffect(() => {
-    // Ejecuta solo una vez al inicio
-    const sessionExpired = checkSessionValidity();
-    if (sessionExpired) {
-      ("Sesión expirada, cerrando sesión...");
-    } else {
-      ("Sesión válida, configurando temporizador...");
-    }
-  }, []);
+  //useEffect(() => {
+  //  // Ejecuta solo una vez al inicio
+  //  const sessionExpired = checkSessionValidity();
+  //  if (sessionExpired) {
+  //    ("Sesión expirada, cerrando sesión...");
+  //  } else {
+  //    ("Sesión válida, configurando temporizador...");
+  //  }
+  //}, []);
   
   return (
     <Provider store={store}>

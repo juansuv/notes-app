@@ -5,7 +5,7 @@ import Navbar from "../../components/navigation/Navbar";
 import { Box, Button, TextField, Typography, Paper, Grid } from "@mui/material";
 import image from "../../assets/img/banner-login.jpeg"; // Cambia la ruta si es necesario
 import { Link } from "react-router-dom";
-import { loginUser } from "../../redux/actions/users/userLogin"; // Importa la acción de login
+import { loginUser, loginUserCookies } from "../../redux/actions/users/userLogin"; // Importa la acción de login
 import { useNavigate, useLocation } from "react-router-dom";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { AppDispatch } from "../../store";
@@ -13,7 +13,7 @@ import { AppDispatch } from "../../store";
 const Login = () => {
   const [username, setUsername] = useState(""); // Estado para el nombre de usuario
   const [password, setPassword] = useState(""); // Estado para la contraseña
-  const { token, error } = useSelector((state: { auth: { token: string; error: string } }) => state.auth); // Accede al estado global de Redux
+  const { success, error } = useSelector((state: { auth: { success: boolean; error: string } }) => state.auth); // Accede al estado global de Redux
 
   const dispatch = useDispatch<AppDispatch>(); // Tipas correctamente el dispatch
   const location = useLocation();
@@ -23,12 +23,15 @@ const Login = () => {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    dispatch(loginUser(username, password));
+    dispatch(loginUserCookies(username, password));
+    
   };
 
-  if (token) {
+  if (success) {
+    console.log("login redirection")
     navigate("/notes");
   }
+
   return (
     <Layout>
       <Navbar />
@@ -128,7 +131,7 @@ const Login = () => {
             </Box>
 
             {/* Mostrar token o error */}
-            {token && (
+            {success && (
               <Typography
                 variant="body2"
                 sx={{

@@ -2,6 +2,7 @@
 import axios from "axios";
 import { NoteInterface } from "../../../utils/types";
 import { AppDispatch, RootState } from "../../../store";
+import { apiClient } from "../../../utils/sessionUtils";
 import {
   CREATE_NOTE_SUCCESS,
   UPDATE_NOTE_SUCCESS,
@@ -28,7 +29,7 @@ export const createNote = (note: NoteInterface) => async (dispatch: AppDispatch,
   const apiUrl = import.meta.env.VITE_APP_NOTE_API_URL;
 
   try {
-    const response = await axios.post(`${apiUrl}/api/notes`, note, {
+    const response = await apiClient.post(`${apiUrl}/api/notes`, note, {
       headers: {
         Authorization: `${token_type} ${token}`,
       },
@@ -52,7 +53,7 @@ export const updateNote = (note: NoteInterface) => async (dispatch: AppDispatch,
   const token = state.auth.token;
   const apiUrl = import.meta.env.VITE_APP_NOTE_API_URL;
   try {
-    const response = await axios.put(`${apiUrl}/api/notes/${note.id}`, note, {
+    const response = await apiClient.put(`${apiUrl}/api/notes/${note.id}`, note, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -96,7 +97,7 @@ export const deleteNote = (id: number) => async (dispatch: AppDispatch, getState
   const apiUrl = import.meta.env.VITE_APP_NOTE_API_URL;
 
   try {
-    await axios.delete(`${apiUrl}/api/notes/${id}`, {
+    await apiClient.delete(`${apiUrl}/api/notes/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -139,7 +140,7 @@ export const fetchNotes = () => async (dispatch: AppDispatch, getState: () => Ro
   dispatch(fetchNotesRequest());
 
   try {
-    const response = await axios.get(`${apiUrl}/api/notes`, {
+    const response = await apiClient.get(`${apiUrl}/api/notes`, {
       headers: {
         Authorization: `${token_type} ${token}`,
       },

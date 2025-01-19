@@ -12,7 +12,6 @@ async def create_note(db: AsyncSession, note: NoteCreate, user_id: int):
     - `note`: Esquema de la nota a crear.
     - `user_id`: ID del usuario propietario de la nota.
     """
-    print(note.shared_with)  # Muestra los usuarios con los que la nota se compartirá
     db_note = Note(
         **note.model_dump(),  # Mapea los campos del esquema a la instancia del modelo
         owner_id=user_id,  # Establece el propietario de la nota
@@ -51,7 +50,6 @@ async def get_note_by_id(db: AsyncSession, note_id: int, user_id: int):
     if not note:
         # Si la nota no existe, retorna un objeto con el mensaje correspondiente
         return {"error": "Note not found"}
-
     # Verifica si el usuario tiene permisos para acceder a la nota
     if note.owner_id != user_id and user_id not in note.shared_with:
         # Retorna la nota con un mensaje de "Access denied"

@@ -55,3 +55,32 @@ export const loginUser =
       });
     }
   };
+
+
+
+
+
+export const loginUserCookies =
+  (username: string, password: string) => async (dispatch: AppDispatch) => {
+    try {
+      const apiUrl = import.meta.env.VITE_APP_NOTE_API_URL;
+      const body = { username, password };
+
+      // Configura axios para enviar cookies automáticamente
+      const res = await axios.post(`${apiUrl}/api/auth/login_cookie`, body, {
+        withCredentials: true,
+      });
+
+      dispatch({
+        type: LOGIN_USER_SUCCESS,
+        payload: res.data,
+      });
+    } catch (error: unknown) {
+      dispatch({
+        type: LOGIN_USER_FAILURE,
+        payload: axios.isAxiosError(error)
+          ? error.response?.data?.message || "Error al iniciar sesión. Usuario o Contraseña incorrectos"
+          : "Error desconocido al iniciar sesión",
+      });
+    }
+  };

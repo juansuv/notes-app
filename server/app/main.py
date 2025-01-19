@@ -39,7 +39,6 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         loc = " -> ".join(str(e) for e in error["loc"])  # Ubicación del campo
         msg = error["msg"]  # Mensaje de error
         errors.append({"field": loc, "error": msg})
-    print(errors)
     return JSONResponse(
         status_code=422,
         content={"detail": "Validation error", "errors": errors},

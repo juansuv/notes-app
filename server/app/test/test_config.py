@@ -9,7 +9,6 @@ import asyncio
 load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL")
-print(DATABASE_URL)
 
 # Motor para PostgreSQL en pruebas
 test_engine = create_async_engine(DATABASE_URL, echo=True, future=True)
@@ -26,7 +25,6 @@ async def init_test_db():
     """
     Crea las tablas en la base de datos de pruebas.
     """
-    print("iniciando la base de datosssc")
     async with test_engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)

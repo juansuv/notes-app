@@ -1,3 +1,4 @@
+import { arch } from "os";
 import { LOGIN_USER_SUCCESS, LOGIN_USER_FAILURE, LOGOUT_USER, UserAction } from "../actions/users/types";
 
 interface AuthState {
@@ -6,6 +7,7 @@ interface AuthState {
   error: string | null;
   username: string | null;
   tokenExpiration: number | null;
+  success: boolean;
 }
 
 const initialState: AuthState = {
@@ -14,21 +16,25 @@ const initialState: AuthState = {
   error: null,
   username: null,
   tokenExpiration: null,
+  success: false,
 };
 
 const authReducer = (state = initialState, action: UserAction): AuthState => {
   switch (action.type) {
     case LOGIN_USER_SUCCESS:
+      console.log("login user success",action.payload);
       return {
         ...state,
-        token: action.payload.token, // Guarda el token en el estado
-        token_type: action.payload.token_type, // Guarda el token en el estado
+        token: null, // Guarda el token en el estado
+        token_type: null, // Guarda el token en el estado
         error: null,
         username: action.payload.username,
         tokenExpiration: action.payload.tokenExpiration,
+        success: true,
       };
 
     case LOGIN_USER_FAILURE:
+      console.log("login failurjuane",action.payload);
       return {
         ...state,
         token: null, // limpiar el token en caso de error

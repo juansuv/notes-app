@@ -3,9 +3,9 @@ import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
 
 const ProtectedRoute = ({ children }) => {
-  const { token } = useSelector((state) => state.auth);
+  const { success } = useSelector((state) => state.auth);
   
-  if (!token) {
+  if (!success) {
     // Redirige al login si no está autenticado
     return <Navigate to="/login" />;
   }
