@@ -1,5 +1,5 @@
 {
-  "name": "notes-frontend-app",
+  "name": "frontend",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -16,6 +16,7 @@
     "@mui/material": "^6.4.0",
     "@redux-devtools/extension": "^3.3.0",
     "axios": "^1.7.9",
+    "jwt-decode": "^4.0.0",
     "react": "^18.3.1",
     "react-color": "^2.19.3",
     "react-dom": "^18.3.1",
