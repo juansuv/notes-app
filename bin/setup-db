@@ -52,7 +52,7 @@ echo "Iniciando configuración de las bases de datos..."
 # Comando para crear usuario y asignar permisos si no existe
 create_user() {
   echo "Creando usuario: $DB_USER"
-  psql -U postgres -c "DO \$\$
+  sudo -U postgres psql -c "DO \$\$
   BEGIN
     IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = '$DB_USER') THEN
       CREATE ROLE $DB_USER WITH LOGIN PASSWORD '$DB_PASS';
@@ -67,7 +67,7 @@ create_databases() {
   DATABASES=("$DB_NAME" "$DB_TEST_NAME")
   for DB in "${DATABASES[@]}"; do
     echo "Creando base de datos: $DB"
-    psql -U postgres -c "CREATE DATABASE \"$DB\" OWNER $DB_USER;" || \
+    sudo -U postgres psql  -c "CREATE DATABASE \"$DB\" OWNER $DB_USER;" || \
       echo "La base de datos $DB ya existe o no se pudo crear."
   done
 }
@@ -98,7 +98,7 @@ run_migrations() {
 
   # Ejecutar las migraciones usando la ruta completa de alembic
   
-  ./venv/bin/alembic -c ./alembic.ini upgrade head --verbose
+  ./venv/bin/alembic -c ./alembic.ini upgrade head
 
 
   if [ $? -eq 0 ]; then
@@ -117,9 +117,9 @@ run_migrations() {
 
 
 # Llamar funciones
-#check_postgres
-#create_user
-#create_databases
+check_postgres
+create_user
+create_databases
 run_migrations
 
 deactivate
