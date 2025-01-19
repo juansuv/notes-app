@@ -1,111 +1,77 @@
 #!/bin/bash
 
-set -e
+# Cargar variables desde archivos .env y .env.test
+# Ruta a la carpeta que contiene los archivos de configuración
+ENV_DIR="./server/app"
 
-# Colores para el log
-GREEN="\033[0;32m"
-RED="\033[0;31m"
-YELLOW="\033[0;33m"
-RESET="\033[0m"
 
-# Carga las variables de entorno para las bases de datos de producción y test
-source ./server/app/.env
-source ./server/app/.env.test
 
-# Función para mostrar mensajes de éxito y error
-log_success() {
-  echo -e "${GREEN}[✔] $1${RESET}"
-}
+# Archivo principal de configuración (.env)
+if [ -f "$ENV_DIR/.env" ]; then
+  export $(grep -v '^#' "$ENV_DIR/.env" | xargs)
+  echo "Variables cargadas desde .env"
+else
+  echo "Archivo .env no encontrado en $ENV_DIR. Por favor, verifica."
+  exit 1
+fi
 
-log_error() {
-  echo -e "${RED}[✘] $1${RESET}"
-}
+# Archivo de configuración de pruebas (.env.test)
+if [ -f "$ENV_DIR/.env.test" ]; then
+  export $(grep -v '^#' "$ENV_DIR/.env.test" | xargs)
+  echo "Variables cargadas desde .env.test"
+else
+  echo "Archivo .env.test no encontrado en $ENV_DIR. Por favor, verifica."
+  exit 1
+fi
 
-log_warning() {
-  echo -e "${YELLOW}[ℹ] $1${RESET}"
-}
-
-# Verifica que PostgreSQL esté instalado
-check_postgresql_installed() {
-  if ! command -v psql > /dev/null; then
-    log_error "PostgreSQL no está instalado. Por favor instálalo e intenta de nuevo."
+# Verificar variables obligatorias
+REQUIRED_VARS=("DB_USER" "DB_PASS" "DB_HOST" "DB_PORT" "DB_NAME" "DB_TEST_NAME")
+for VAR in "${REQUIRED_VARS[@]}"; do
+  if [ -z "${!VAR}" ]; then
+    echo "Error: La variable $VAR no está definida en los archivos .env o .env.test."
     exit 1
   fi
-}
+done
 
-# Verifica que el servicio de PostgreSQL esté corriendo
-start_postgresql_service() {
-  if [[ "$OSTYPE" == "darwin"* ]]; then
-    brew services start postgresql
-  else
-    sudo service postgresql start
-  fi
-  log_success "Servicio de PostgreSQL iniciado."
-}
+# Crear bases de datos
+echo "Iniciando configuración de las bases de datos..."
 
-# Ejecuta comandos bajo el usuario postgres
-run_as_postgres() {
-  sudo -u postgres bash -c "$1" || {
-    log_error "Error ejecutando: $1"
-    exit 1
-  }
-}
-
-# Configura el usuario de la base de datos
+# Comando para crear usuario y asignar permisos si no existe
 create_user() {
-  log_warning "🔑 Recomendación: Usa 'Notes123' como contraseña para la base de datos para evitar problemas."
-  log_warning "ℹ Se pedirá la contraseña de tu usuario del sistema operativo (con permisos sudo) para ejecutar comandos administrativos."
-
-  echo "Creando el usuario '$DB_USER' si no existe..."
-  run_as_postgres "psql -c \"DO \$\$ BEGIN IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = '$DB_USER') THEN CREATE ROLE $DB_USER LOGIN PASSWORD '$DB_PASS'; END IF; END \$\$;\""
-  log_success "Usuario configurado exitosamente."
+  echo "Creando usuario: $DB_USER"
+  psql -U postgres -c "DO \$\$
+  BEGIN
+    IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = '$DB_USER') THEN
+      CREATE ROLE $DB_USER WITH LOGIN PASS '$DB_PASS';
+      ALTER ROLE $DB_USER CREATEDB;
+    END IF;
+  END
+  \$\$;"
 }
 
-# Elimina una base de datos
-drop_database() {
-  local db_name=$1
-  echo "Eliminando la base de datos '$db_name' si existe..."
-  run_as_postgres "psql -c \"DROP DATABASE IF EXISTS $db_name;\""
-  log_success "Base de datos '$db_name' eliminada exitosamente."
+# Comando para crear bases de datos
+create_databases() {
+  DATABASES=("$DB_NAME" "$DB_TEST_NAME")
+  for DB in "${DATABASES[@]}"; do
+    echo "Creando base de datos: $DB"
+    psql -U postgres -c "CREATE DATABASE \"$DB\" OWNER $DB_USER;" || \
+      echo "La base de datos $DB ya existe o no se pudo crear."
+  done
 }
 
-# Crea una nueva base de datos
-create_database() {
-  local db_name=$1
-  echo "Creando la base de datos '$db_name'..."
-  run_as_postgres "psql -c \"CREATE DATABASE $db_name OWNER $DB_USER;\""
-  log_success "Base de datos '$db_name' creada exitosamente."
+# Verificar y conectar al servidor PostgreSQL
+check_postgres() {
+  echo "Verificando conexión a PostgreSQL..."
+  pg_isready -h "$DB_HOST" -p "$DB_PORT" > /dev/null 2>&1
+  if [ $? -ne 0 ]; then
+    echo "No se puede conectar a PostgreSQL en $DB_HOST:$DB_PORT. Verifica que el servidor esté activo."
+    exit 1
+  fi
 }
 
-# Configura las extensiones necesarias en una base de datos
-configure_extensions() {
-  local db_name=$1
-  echo "Agregando extensiones requeridas en la base de datos '$db_name'..."
-  run_as_postgres "psql -d $db_name -c \"CREATE EXTENSION IF NOT EXISTS pgcrypto;\""
-  log_success "Extensiones configuradas exitosamente en '$db_name'."
-}
+# Llamar funciones
+check_postgres
+create_user
+create_databases
 
-# Ejecuta las funciones principales
-setup_database() {
-  local db_name=$1
-  drop_database $db_name
-  create_database $db_name
-  configure_extensions $db_name
-}
-
-main() {
-  check_postgresql_installed
-  start_postgresql_service
-
-  create_user
-
-  echo "Configurando base de datos principal ($DB_NAME)..."
-  setup_database $DB_NAME
-
-  echo "Configurando base de datos de pruebas ($DB_NAME_TEST)..."
-  setup_database $DB_NAME_TEST
-
-  log_success "¡Todas las bases de datos han sido configuradas exitosamente!"
-}
-
-main
+echo "¡Configuración completada!"
