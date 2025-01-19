@@ -58,9 +58,42 @@ export const checkSessionValidity = () => {
 
 
 
+import  {jwtDecode, JwtPayload } from "jwt-decode";
+
+export function isTokenExpired(token: string): boolean {
+    const decoded: JwtPayload = jwtDecode(token);
+    const currentTime = Date.now() / 1000; // Convertir a segundos
+    return decoded.exp ? decoded.exp < currentTime : true;
+}
+
+
 // Configuración base para Axios
-export const apiClient = axios.create({
+const apiClient = axios.create({
   baseURL: import.meta.env.VITE_APP_NOTE_API_URL, // URL base de la API
   withCredentials: true, // Habilita envío de cookies automáticamente
 });
 
+
+apiClient.interceptors.request.use(async (config) => {
+  const token = localStorage.getItem("access_token");
+
+  if (token && isTokenExpired(token)) {
+      try {
+          const response = await axios.post("/auth/refresh", {}, { withCredentials: true });
+          const newToken = response.data.access_token;
+          localStorage.setItem("access_token", newToken);
+          config.headers.Authorization = `Bearer ${newToken}`;
+          console.log("Token refreshed successfully");
+      } catch (error) {
+          console.error("Error refreshing token:", error);
+          // Opcional: redirigir al usuario al login
+      }
+  }
+
+  if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+export default apiClient;

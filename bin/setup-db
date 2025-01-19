@@ -3,8 +3,21 @@
 # Cargar variables desde archivos .env y .env.test
 # Ruta a la carpeta que contiene los archivos de configuración
 ENV_DIR="./server/app"
+VENV_DIR="./server/venv" # Ruta al entorno virtual
 
 
+# Verificar que el entorno virtual exista
+if [ ! -d "$VENV_DIR" ]; then
+  echo "El entorno virtual no existe en $VENV_DIR. Por favor, créalo antes de continuar."
+  exit 1
+fi
+
+# Activar entorno virtual
+source "$VENV_DIR/bin/activate"
+if [ $? -ne 0 ]; then
+  echo "Error al activar el entorno virtual. Verifica que esté correctamente configurado."
+  exit 1
+fi
 
 # Archivo principal de configuración (.env)
 if [ -f "$ENV_DIR/.env" ]; then
@@ -69,9 +82,37 @@ check_postgres() {
   fi
 }
 
+run_migrations() {
+  echo "Ejecutando migraciones..."
+  cd "$(dirname "$0")/../server"
+
+  # Activar el entorno virtual
+  source venv/bin/activate
+
+  # Ejecutar las migraciones usando la ruta completa de alembic
+  ./venv/bin/alembic upgrade head
+
+  if [ $? -eq 0 ]; then
+    echo "Migraciones ejecutadas correctamente."
+  else
+    echo "Error al ejecutar las migraciones. Revisa la configuración de Alembic."
+    deactivate
+    exit 1
+  fi
+
+  # Desactivar el entorno virtual
+  deactivate
+  popd || exit 1
+}
+
+
+
 # Llamar funciones
 check_postgres
 create_user
 create_databases
+run_migrations
+
+deactivate
 
 echo "¡Configuración completada!"

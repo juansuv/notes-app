@@ -2,7 +2,7 @@
 import axios from "axios";
 import { NoteInterface } from "../../../utils/types";
 import { AppDispatch, RootState } from "../../../store";
-import { apiClient } from "../../../utils/sessionUtils";
+import apiClient from "../../../utils/sessionUtils";
 import {
   CREATE_NOTE_SUCCESS,
   UPDATE_NOTE_SUCCESS,

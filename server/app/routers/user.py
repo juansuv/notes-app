@@ -126,3 +126,17 @@ async def logout_cookie():
     response = JSONResponse(content={"message": "Logout successful"})
     response.delete_cookie(key="access_token")
     return response
+
+
+
+from app.utils.dependencies import  get_current_active_user
+
+@router.post("/auth/refresh")
+def refresh_token(user: dict = Depends(get_current_active_user)):
+    try:
+        new_token = create_access_token({"sub": user["username"], "user_id": user["id"]})
+        return {"access_token": new_token}
+    except Exception as e:
+        raise HTTPException(status_code=401, detail="Unable to refresh token")
+    
+    
