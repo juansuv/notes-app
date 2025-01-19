@@ -23,6 +23,7 @@ app.add_middleware(
     allow_headers=["*"],  # Permitir todos los encabezados
 )
 
+
 app.include_router(user.router, prefix="/api/auth", tags=["Users"])
 app.include_router(note.router, prefix="/api/notes", tags=["Notes"])
 app.include_router(note_websocket.router, tags=["WebSockets"])

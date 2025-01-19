@@ -1,3 +1,6 @@
+
+
+
 /**
  * Limpia la sesión del usuario y redirige al login si no estamos ya en esa ruta.
  */
@@ -14,7 +17,6 @@ import axios from "axios";
 
 export const logout_cookies = async () => {
   const apiUrl = import.meta.env.VITE_APP_NOTE_API_URL;
-
   try {
     await axios.post(`${apiUrl}/api/auth/logout_cookie`, {}, { withCredentials: true });
     window.location.href = "/login";
@@ -53,7 +55,6 @@ export const checkSessionValidity = () => {
   //  const timeRemaining = expirationTime - new Date().getTime(); // Calculo el tiempo restante.
   //  startSessionTimer(timeRemaining); // Configuro el temporizador para cerrar la sesión cuando corresponda.
   //}
-  console.log("validacion de session por cookies");
 };
 
 
@@ -76,14 +77,14 @@ const apiClient = axios.create({
 
 apiClient.interceptors.request.use(async (config) => {
   const token = localStorage.getItem("access_token");
-
+  const apiUrl = import.meta.env.VITE_APP_NOTE_API_URL;
   if (token && isTokenExpired(token)) {
       try {
-          const response = await axios.post("/auth/refresh", {}, { withCredentials: true });
+          const response = await axios.post(`${apiUrl}/api/auth/refresh`, {}, { withCredentials: true });
           const newToken = response.data.access_token;
           localStorage.setItem("access_token", newToken);
           config.headers.Authorization = `Bearer ${newToken}`;
-          console.log("Token refreshed successfully");
+          return config;
       } catch (error) {
           console.error("Error refreshing token:", error);
           // Opcional: redirigir al usuario al login
@@ -97,3 +98,4 @@ apiClient.interceptors.request.use(async (config) => {
 });
 
 export default apiClient;
+

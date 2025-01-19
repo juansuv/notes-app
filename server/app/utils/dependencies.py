@@ -26,6 +26,7 @@ async def get_current_active_user(request: Request, db: AsyncSession = Depends(g
         raise HTTPException(status_code=401, detail="Not authenticated")
     
     payload = decode_access_token(token.replace("Bearer ", ""))
+    print(payload)
     username: str = payload.get("sub")
     if not username:
         raise HTTPException(status_code=401, detail="Invalid token")
