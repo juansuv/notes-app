@@ -142,7 +142,7 @@ const Login = () => {
                 Sesión iniciada.
               </Typography>
             )}
-            {error && (
+            {!message && error && (
               <Typography
                 variant="body2"
                 sx={{

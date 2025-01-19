@@ -6,6 +6,7 @@ export const logoutUser = () => {
   logout_cookies();
   //sessionStorage.removeItem("token");
   //sessionStorage.removeItem("username");
+  localStorage.removeItem("access_token");
 
   return {
     type: LOGOUT_USER,

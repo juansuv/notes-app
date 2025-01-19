@@ -70,6 +70,8 @@ export const loginUserCookies =
       const res = await axios.post(`${apiUrl}/api/auth/login_cookie`, body, {
         withCredentials: true,
       });
+        localStorage.setItem("access_token", res.data.token);
+        localStorage.setItem("username", res.data.username);
 
       dispatch({
         type: LOGIN_USER_SUCCESS,

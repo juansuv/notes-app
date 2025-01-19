@@ -110,7 +110,7 @@ async def login_cookie(userLogin: UserLogin, db: AsyncSession = Depends(get_db))
     token = create_access_token(data={"sub": db_user.username, "user_id": db_user.id})
 
     # Crear respuesta con token en cookie segura
-    response = JSONResponse(content={"message": "Login successful", "username": db_user.username })
+    response = JSONResponse(content={"message": "Login successful", "username": db_user.username, "token": f"Bearer {token}"})
     response.set_cookie(
         key="access_token",
         value=f"Bearer {token}",
