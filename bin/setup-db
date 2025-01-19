@@ -55,7 +55,7 @@ create_user() {
   psql -U postgres -c "DO \$\$
   BEGIN
     IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = '$DB_USER') THEN
-      CREATE ROLE $DB_USER WITH LOGIN PASS '$DB_PASS';
+      CREATE ROLE $DB_USER WITH LOGIN PASSWORD '$DB_PASS';
       ALTER ROLE $DB_USER CREATEDB;
     END IF;
   END
@@ -84,13 +84,22 @@ check_postgres() {
 
 run_migrations() {
   echo "Ejecutando migraciones..."
-  cd "$(dirname "$0")/../server"
+  cd "$(dirname "$0")/../server" || { echo "No se pudo cambiar al directorio del servidor"; exit 1; }
 
   # Activar el entorno virtual
+  # Activar el entorno virtual
   source venv/bin/activate
+  if [ -z "$VIRTUAL_ENV" ]; then
+    echo "Error: No se pudo activar el entorno virtual."
+    exit 1
+  else
+    echo "Entorno virtual activado: $VIRTUAL_ENV"
+  fi
 
   # Ejecutar las migraciones usando la ruta completa de alembic
-  ./venv/bin/alembic upgrade head
+  
+  ./venv/bin/alembic -c ./alembic.ini upgrade head --verbose
+
 
   if [ $? -eq 0 ]; then
     echo "Migraciones ejecutadas correctamente."
@@ -102,15 +111,15 @@ run_migrations() {
 
   # Desactivar el entorno virtual
   deactivate
-  popd || exit 1
+  exit 1
 }
 
 
 
 # Llamar funciones
-check_postgres
-create_user
-create_databases
+#check_postgres
+#create_user
+#create_databases
 run_migrations
 
 deactivate
