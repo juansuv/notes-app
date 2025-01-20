@@ -320,6 +320,15 @@
    - Amplia colección de componentes listos para usar.
    - Soporte para temas personalizados.
    - Integración fluida con React.
+
+ **Framer Motion**
+ - **Descripción**: Una librería de animación para React que permite crear animaciones fluidas y dinámicas.
+ - **Razones para elegirlo**:
+   - Proporciona una API intuitiva y fácil de usar para implementar animaciones avanzadas.
+   - Es compatible con React, lo que facilita su integración en los componentes del frontend.
+   - Permite mejorar la experiencia de usuario al añadir transiciones suaves entre las vistas y animaciones en elementos interactivos.
+   - Se utilizó para enriquecer la interfaz de usuario, especialmente en las transiciones entre pantallas y para destacar elementos interactivos como botones y formularios.
+
  
   **Redux**
  - **Descripción**: Redux es una librería para el manejo del estado global en aplicaciones JavaScript.
