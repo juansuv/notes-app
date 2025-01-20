@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { TextField, Chip, Box } from "@mui/material";
+import { TextField, Chip, Box, Typography } from "@mui/material";
 
 interface TagsInputProps {
   currentTags: string[];
@@ -45,6 +45,19 @@ const TagsInput: React.FC<TagsInputProps> = ({
 
   return (
     <Box>
+      <Typography
+        variant="body2"
+        sx={{
+          color: textColor,
+          marginBottom: "4px",
+          marginTop: "16px",
+          fontFamily: "'Roboto', sans-serif",
+        }}
+        
+        
+      >
+        Escribe una etiqueta y presiona <b>Enter</b> para añadirla.
+      </Typography>
       <TextField
         label="Añadir Etiqueta"
         value={inputValue}
@@ -53,6 +66,10 @@ const TagsInput: React.FC<TagsInputProps> = ({
         fullWidth
         disabled={viewMode}
         margin="normal"
+        sx={{
+          marginBottom: "16px",
+          borderRadius: "8px",
+        }}
         InputLabelProps={{ style: { color: textColor } }}
         InputProps={{
           style: { color: textColor, borderColor: textColor },

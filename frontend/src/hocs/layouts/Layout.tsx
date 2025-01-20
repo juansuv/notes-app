@@ -1,6 +1,6 @@
 import { connect } from "react-redux";
-import  { ReactNode } from "react";
-
+import { ReactNode } from "react";
+import { motion } from "framer-motion";
 // Defino las propiedades esperadas para este componente.
 // Esto incluye los hijos que se renderizarán dentro del layout.
 interface LayoutProps {
@@ -11,10 +11,14 @@ interface LayoutProps {
 // Esto me permite cargar el estado en toda la página mediante Redux.
 function Layout({ children }: LayoutProps) {
   return (
-    <div>
+    <motion.div
+      initial={{ opacity: 0, transition: { duration: 0.5 } }}
+      animate={{ opacity: 1, transition: { duration: 0.5 } }}
+      exit={{ opacity: 0, transition: { duration: 0.5 } }}
+    >
       {/* Renderizo los elementos hijos que se pasen a este layout */}
       {children}
-    </div>
+    </motion.div>
   );
 }
 

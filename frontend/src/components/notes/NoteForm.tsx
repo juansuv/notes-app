@@ -110,6 +110,8 @@ const NoteForm: React.FC<NoteFormProps> = ({
         padding: 2,
         width: "100vw",
         maxWidth: "100%",
+        minHeight: "100vh",
+
         height: "100%",
         boxShadow: adjustColor(color, 200),
       }}
@@ -135,11 +137,13 @@ const NoteForm: React.FC<NoteFormProps> = ({
       >
         {/* Título de la nota */}
         <Typography
-          variant="h5"
+          variant="h4"
+          component="h1"
           sx={{
             fontWeight: "bold",
             textShadow: `0px 0px 4px ${textColor === "#000" ? "#fff" : "#000"}`,
             textAlign: "center",
+            fontFamily: "'Poppins', sans-serif",
           }}
         >
           {viewNote}
@@ -164,6 +168,7 @@ const NoteForm: React.FC<NoteFormProps> = ({
             onChange={(e) => handleFieldChange("title", e.target.value)}
             required
             disabled={isViewMode}
+            sx={{ marginBottom: "16px", borderRadius: "8px" }}
             InputLabelProps={{
               style: { color: textColor },
             }}
@@ -182,6 +187,7 @@ const NoteForm: React.FC<NoteFormProps> = ({
             value={content}
             onChange={(e) => handleFieldChange("content", e.target.value)}
             required
+            sx={{ marginBottom: "16px", borderRadius: "8px" }}
             disabled={isViewMode}
             InputLabelProps={{
               style: { color: textColor },

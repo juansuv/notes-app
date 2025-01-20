@@ -24,6 +24,8 @@ const ColorPicker: React.FC<ColorPickerProps> = ({
   };
 
   return (
+
+    
     <Box sx={{ marginTop: 2 }}>
       <TextField
         type="color"
