@@ -5,7 +5,7 @@
 **NotiFy** es una aplicación web diseñada para gestionar notas personales. Esta aplicación permite a los usuarios crear, leer, actualizar y eliminar notas de manera segura y eficiente. Cada usuario debe autenticarse para acceder a sus notas, garantizando privacidad y protección de datos. Una característica destacada del proyecto es la implementación de una estrategia de bloqueo eficiente en el backend para manejar problemas de concurrencia y prevenir condiciones de carrera, simulando un entorno altamente paralelizado.
 
 ### Puntos tratados en esta documentación
-1. [**Instrucciones sobre cómo configurar y ejecutar el proyecto localmente.**]#(instrucciones-para-configurar-y-ejecutar-el-proyecto)
+1. [**Instrucciones sobre cómo configurar y ejecutar el proyecto localmente.**](#instrucciones-para-configurar-y-ejecutar-el-proyecto)
 2. [**Tecnologías utilizadas y razones para elegirlas.**](#tecnologías-utilizadas-y-razones-para-elegirlas)
 3. [**Explicación detallada de la estrategia de bloqueo implementada.**](#explicación-detallada-de-la-estrategia-de-bloqueo-implementada)
 4. [**Desafíos enfrentados y soluciones, especialmente en relación con problemas de concurrencia.**](#desafíos-enfrentados-y-cómo-se-superaron)
