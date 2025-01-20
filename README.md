@@ -357,7 +357,21 @@
      - **asyncpg**
    - Estas versiones permitieron un manejo más consistente de los eventos de bucle y evitaron problemas al ejecutar pruebas concurrentes.
  
- **PostgreSQL**
+ **JWT (JSON Web Token)**
+ - **Descripción**: Una librería utilizada para la autenticación mediante tokens seguros.
+ - **Razones para elegirlo**:
+    - Proporciona un método eficiente y seguro para autenticar usuarios y mantener sesiones activas.
+    - Compatible con FastAPI y fácil de integrar con el flujo de autorización.
+    - Se utilizó específicamente para manejar el inicio de sesión mediante cookies seguras y la emisión de refresh tokens, permitiendo mantener la sesión activa de forma eficiente y segura.
+
+**bcrypt**
+- **Descripción**: Una librería de encriptación utilizada para proteger contraseñas.
+- **Razones para elegirlo**:
+    - Proporciona encriptación robusta y comprobada para almacenar contraseñas de manera segura.
+    - Es ampliamente utilizada en la industria y compatible con múltiples lenguajes.
+    - Se utilizó para encriptar las contraseñas de los usuarios antes de almacenarlas en la base de datos, garantizando un nivel alto de seguridad.
+
+  **PostgreSQL**
  - **Descripción**: PostgreSQL es un sistema de gestión de bases de datos relacional avanzado y de código abierto.
  - **Razones para elegirlo**:
    - Soporte para datos estructurados y consultas complejas.
