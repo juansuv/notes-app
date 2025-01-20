@@ -37,7 +37,14 @@ function Navbar({ isAuthenticated, username, logoutUser }: NavbarProps) {
           edge="start"
           color="inherit"
           aria-label="menu"
-          sx={{ mr: 2 }}
+          sx={{
+            mr: 3,
+            "@media (max-width: 600px)": {
+              fontSize: "1.3rem",
+              paddingRight: 2,
+              mr: 0,
+            },
+          }}
           component={Link}
           to="/"
         >
@@ -45,39 +52,134 @@ function Navbar({ isAuthenticated, username, logoutUser }: NavbarProps) {
         </IconButton>
         <Typography
           variant="h6"
-          component={isAuthenticated ? Link : "div"} // Si está autenticado, es un botón con enlace
-          to={isAuthenticated ? "/notes" : undefined}
+          component="div"
           sx={{
             flexGrow: 1,
-            textDecoration: isAuthenticated ? "none" : "inherit",
-            color: "inherit",
+            display: "flex", // Para centrar el contenido si es necesario
+            alignItems: "center",
+            justifyContent: "left",
+            textShadow: "2px 2px 6px rgba(0, 0, 0, 0.7)", // Sombra más pronunciada
+            fontSize: "1.7rem", // Ajusta el tamaño de la fuente
+            "@media (max-width: 600px)": {
+              fontSize: "1.3rem",
+              paddingRight: 2,
+            },
           }}
         >
-          NotaFy
+          {isAuthenticated ? (
+            <div>
+              <Link
+                to="/notes"
+                style={{
+                  textDecoration: "none",
+                  color: "inherit",
+                  display: "inline-block", // Limita el área clickeable
+                }}
+              >
+                NotaFy
+              </Link>
+            </div>
+          ) : (
+            "NotaFy"
+          )}
         </Typography>
         {isAuthenticated ? (
           <>
             <Typography
-              variant="body1"
+              variant="h5"
               sx={{
-                mr: 2,
-                color: "white",
+                mr: 4,
+                color: "white", // Color del texto
                 display: "inline-block",
+                fontWeight: "bold", // Texto en negrita
+                textShadow: "2px 2px 6px rgba(0, 0, 0, 0.7)", // Sombra más pronunciada
+                fontSize: "1.5rem", // Ajusta el tamaño de la fuente
+                letterSpacing: "0.05em", // Espaciado entre letras
+                "@media (max-width: 600px)": {
+                  fontSize: "1.3rem", // Tamaño de fuente más pequeño
+                  flexDirection: "column", // Alinea el texto y el ícono en columnas
+                  alignItems: "center",
+                  paddingRight: 16,
+                },
               }}
             >
               {username}
             </Typography>
             <Button
               color="inherit"
-              onClick={logoutUser} // Acción para cerrar sesión
+              onClick={logoutUser}
+              sx={{
+                fontWeight: "bold", // Negrita para que destaque
+                fontSize: "1rem", // Tamaño del texto del botón
+                color: "white", // Color blanco para el texto
+                textShadow: "1px 1px 4px rgba(0, 0, 0, 0.6)", // Sombra para resaltar
+                display: "flex", // Alinea el texto y el icono horizontalmente
+                alignItems: "center", // Centra verticalmente
+                textTransform: "uppercase", // Convierte el texto en mayúsculas
+                padding: "8px 16px", // Espaciado interno del botón
+                borderRadius: "8px", // Bordes redondeados
+                background: "linear-gradient(135deg, #21cbf3 30%, #2196f3 90%)", // Fondo con degradado
+                boxShadow: "2px 4px 8px rgba(0, 0, 0, 0.3)", // Sombra para el botón
+                transition: "transform 0.2s, box-shadow 0.2s", // Animación suave al pasar el mouse
+                "&:hover": {
+                  transform: "scale(1.05)", // Aumenta ligeramente el tamaño al pasar el mouse
+                  boxShadow: "3px 6px 12px rgba(0, 0, 0, 0.5)", // Sombra más pronunciada al hacer hover
+                },
+                "@media (max-width: 600px)": {
+                  fontSize: "0.75rem", // Tamaño de fuente más pequeño
+                  padding: "4px 8px", // Padding reducido
+                  position: "absolute", // Quita el botón del flujo del layout
+                  top: "10px", // Posición en la parte superior del Navbar
+                  right: "10px", // Posición en la parte derecha
+                  borderRadius: "6px",
+                  "& .MuiSvgIcon-root": {
+                    marginLeft: 0, // Quita el margen izquierdo del ícono
+                    marginTop: "4px", // Añade espacio superior al ícono
+                  },
+                },
+              }} // Acción para cerrar sesión
             >
-              Logout
-              <LogoutIcon />
+              Cerrar Sesión
+              <LogoutIcon sx={{ marginLeft: 2 }} />
             </Button>
           </>
         ) : (
-          <Button component={Link} to="/login" color="inherit">
-            Login
+          <Button
+            component={Link}
+            to="/login"
+            color="inherit"
+            sx={{
+              fontWeight: "bold", // Negrita para que destaque
+              fontSize: "1rem", // Tamaño del texto del botón
+              color: "white", // Color blanco para el texto
+              textShadow: "1px 1px 4px rgba(0, 0, 0, 0.6)", // Sombra para resaltar
+              display: "flex", // Alinea el texto y el icono horizontalmente
+              alignItems: "center", // Centra verticalmente
+              textTransform: "uppercase", // Convierte el texto en mayúsculas
+              padding: "8px 16px", // Espaciado interno del botón
+              borderRadius: "8px", // Bordes redondeados
+              background: "linear-gradient(135deg, #21cbf3 30%, #2196f3 90%)", // Fondo con degradado
+              boxShadow: "2px 4px 8px rgba(0, 0, 0, 0.3)", // Sombra para el botón
+              transition: "transform 0.2s, box-shadow 0.2s", // Animación suave al pasar el mouse
+              "&:hover": {
+                transform: "scale(1.05)", // Aumenta ligeramente el tamaño al pasar el mouse
+                boxShadow: "3px 6px 12px rgba(0, 0, 0, 0.5)", // Sombra más pronunciada al hacer hover
+              },
+              "@media (max-width: 600px)": {
+                fontSize: "0.75rem", // Tamaño de fuente más pequeño
+                padding: "4px 8px", // Padding reducido
+                position: "absolute", // Quita el botón del flujo del layout
+                top: "10px", // Posición en la parte superior del Navbar
+                right: "10px", // Posición en la parte derecha
+                borderRadius: "6px",
+                "& .MuiSvgIcon-root": {
+                  marginLeft: 0, // Quita el margen izquierdo del ícono
+                  marginTop: "4px", // Añade espacio superior al ícono
+                },
+              },
+            }}
+          >
+            Iniciar Sesión
             <LoginIcon />
           </Button>
         )}

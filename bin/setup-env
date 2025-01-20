@@ -8,9 +8,9 @@ setup_linux_deps () {
     echo "Instalando dependencias en Linux (APT)..."
     sudo apt update
     sudo apt install -y \
-      python3 \
+      python3.9 \
       python3-pip \
-      python3-venv \
+      python3.9-venv \
       build-essential \
       curl \
       git \

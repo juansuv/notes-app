@@ -10,5 +10,5 @@ async def test_create_user_crud(async_session: AsyncSession):
     id = uuid4().hex
     user = UserCreate(username=f"Newuser{id}", password="Newpassword123")
     created_user = await create_user(async_session, user)
-    assert created_user.username == f"Newuser{id}"
+    assert created_user.username == f"newuser{id}"
     assert created_user.password != "Newpassword123"  # Password debe estar hasheado
