@@ -1,6 +1,6 @@
 # Instrucciones de instalación
 
-Este documento describe el proceso de instalación y configuración inicial de un proyecto basado en **FastAPI** y **React**, incluyendo los scripts `setup-env` y `setup-db` para automatizar la instalación de dependencias y la configuración de base de datos.
+Este  cambia describe el proceso de instalación y configuración inicial de un proyecto basado en **FastAPI** y **React**, incluyendo los scripts `setup-env` y `setup-db` para automatizar la instalación de dependencias y la configuración de base de datos.
 
 En él encontrarás:
 - Cómo preparar tu ambiente local (en Linux o macOS; para Windows se recomienda usar [WSL2](https://learn.microsoft.com/en-us/windows/wsl/install)).
@@ -12,25 +12,27 @@ En él encontrarás:
 
 ---
 
-## Índice
+## Índice![alt text](image.png)
 
-- [Prerequisitos](#prerequisitos)
-- [Guía de inicio rápido](#guía-de-inicio-rápido)
-- [Instalación de Python y Node](#instalación-de-python-y-node)
-- [Configurar motor de base de datos](#configurar-motor-de-base-de-datos)
-- [Instalar dependencias y configurar el proyecto](#instalar-dependencias-y-configurar-el-proyecto)
-  - [Trouble Shooting](#trouble-shooting)
-- [Iniciar los servidores (FastAPI y React)](#iniciar-los-servidores-fastapi-y-react)
-- [Post-instalación](#post-instalación)
-- [Primeros pasos con la aplicación](#primeros-pasos-con-la-aplicación)
-- [Configuraciones](#configuraciones)
-- [Manteniendo actualizadas nuestras dependencias](#manteniendo-actualizadas-nuestras-dependencias)
-  - [Problema y antecedentes](#problema-y-antecedentes)
-  - [Solución-y-cómo-implementarla](#solución-y-cómo-implementarla)
-  - [Casos-de-uso-en-nuestra-aplicación](#casos-de-uso-en-nuestra-aplicación)
-- [Explicación de los scripts setup-env y setup-db](#explicación-de-los-scripts-setup-env-y-setup-db)
-  - [Script setup-env](#script-setup-env)
-  - [Script setup-db](#script-setup-db)
+- [Instrucciones de instalación](#instrucciones-de-instalación)
+  - [Índice](#índice)
+  - [Prerequisitos](#prerequisitos)
+  - [Guía de inicio rápido](#guía-de-inicio-rápido)
+  - [Instalación de Python y Node](#instalación-de-python-y-node)
+  - [Configurar motor de base de datos](#configurar-motor-de-base-de-datos)
+  - [Instalar dependencias y configurar el proyecto](#instalar-dependencias-y-configurar-el-proyecto)
+    - [Trouble Shooting](#trouble-shooting)
+  - [Iniciar los servidores (FastAPI y React)](#iniciar-los-servidores-fastapi-y-react)
+  - [Post-instalación](#post-instalación)
+  - [Primeros pasos con la aplicación](#primeros-pasos-con-la-aplicación)
+  - [Configuraciones](#configuraciones)
+  - [Manteniendo actualizadas nuestras dependencias](#manteniendo-actualizadas-nuestras-dependencias)
+    - [Problema y antecedentes](#problema-y-antecedentes)
+    - [Solución y cómo implementarla](#solución-y-cómo-implementarla)
+    - [Casos de uso en nuestra aplicación](#casos-de-uso-en-nuestra-aplicación)
+  - [Explicación de los scripts setup-env y setup-db](#explicación-de-los-scripts-setup-env-y-setup-db)
+    - [Script setup-env](#script-setup-env)
+    - [Script setup-db](#script-setup-db)
 
 ---
 
